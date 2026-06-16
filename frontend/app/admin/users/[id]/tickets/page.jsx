@@ -37,26 +37,15 @@ export default function UserTicketsPage() {
       return;
     }
 
-    // 2. Fetch user details and their tickets
+    // 2. Fetch user details and their tickets via dedicated endpoint
     const fetchData = async () => {
       try {
-        // Fetch all users to find this user
-        const usersList = await fetchClient('/admin/users');
-        const foundUser = usersList.find(u => u._id === id);
-        
-        if (!foundUser) {
-          showToast('User not found', 'error');
-          router.push('/admin/users');
-          return;
-        }
-        setUser(foundUser);
-
-        // Fetch all tickets to filter for this user
-        const ticketsData = await fetchClient('/admin/tickets?limit=500');
-        const userTickets = (ticketsData.tickets || []).filter(t => t.user_email === foundUser.email);
-        setTickets(userTickets);
+        const data = await fetchClient(`/admin/users/${id}/tickets`);
+        setUser(data.user);
+        setTickets(data.tickets || []);
       } catch (err) {
         showToast(err.message || 'Failed to fetch user ticket data', 'error');
+        router.push('/admin/users');
       } finally {
         setLoading(false);
       }
