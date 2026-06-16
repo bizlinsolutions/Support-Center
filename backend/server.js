@@ -1,4 +1,3 @@
-//Import frameworks
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -11,16 +10,56 @@ const {
   buildTicketDocument,
 } = require('./data/schema');
 const { User } = require('./data/userSchema');
-const { Admin } = require('./data/adminSchema');
 const { authenticateToken } = require('./middleware/auth');
-const { authenticateAdmin } = require('./middleware/adminAuth');
 const { authorizeTicketOwner } = require('./middleware/ticketAuthorization');
+const { requireAdmin } = require('./middleware/adminAuth');
+
+// Ticket Query helper (supporting pagination, sorting, search & filters)
+async function getTicketsWithQuery(req, queryBase = {}) {
+  const { priority, status, search, sortBy = 'createdAt', sortOrder = 'desc', page = 1, limit = 10 } = req.query;
+  const query = { ...queryBase };
+
+  if (priority) query.priority = priority;
+  if (status) query.status = status;
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { body: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  const sortOptions = {};
+  sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+  const pageNum = parseInt(page) || 1;
+  const limitNum = parseInt(limit) || 10;
+  const skip = (pageNum - 1) * limitNum;
+
+  const total = await Ticket.countDocuments(query);
+  const tickets = await Ticket.find(query)
+    .sort(sortOptions)
+    .skip(skip)
+    .limit(limitNum);
+
+  return {
+    tickets,
+    pagination: {
+      total,
+      page: pageNum,
+      limit: limitNum,
+      pages: Math.ceil(total / limitNum),
+    }
+  };
+}
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  credentials: true,
+}));
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/help-desk')
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -38,6 +77,7 @@ function createAccessToken(user) {
       userId: user._id.toString(),
       email: user.email,
       name: user.name,
+      role: user.role,
     },
     ACCESS_TOKEN_SECRET,
     { expiresIn: ACCESS_TOKEN_EXPIRY }
@@ -52,44 +92,28 @@ function createRefreshToken(user) {
   );
 }
 
-function createAdminAccessToken(admin) {
-  return jwt.sign(
-    {
-      adminId: admin._id.toString(),
-      email: admin.email,
-      name: admin.name,
-      role: 'admin',
-    },
-    ACCESS_TOKEN_SECRET,
-    { expiresIn: ACCESS_TOKEN_EXPIRY }
-  );
-}
-
-function createAdminRefreshToken(admin) {
-  return jwt.sign(
-    { adminId: admin._id.toString(), role: 'admin' },
-    REFRESH_TOKEN_SECRET,
-    { expiresIn: REFRESH_TOKEN_EXPIRY }
-  );
-}
-
-async function seedDefaultAdmin() {
-  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@helpdesk.com').trim().toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123456';
-  const existingAdmin = await Admin.findOne({ email: adminEmail });
-  if (existingAdmin) return;
-
-  const passwordHash = await bcrypt.hash(adminPassword, 10);
-  await Admin.create({
-    name: 'Admin',
-    email: adminEmail,
-    passwordHash,
-  });
-  console.log(`Default admin created: ${adminEmail}`);
-}
-
-mongoose.connection.once('open', () => {
-  seedDefaultAdmin().catch((err) => console.error('Admin seed error:', err));
+app.get('/health', async (req, res) => {
+  try {
+    const dbState = mongoose.connection.readyState;
+    const dbStatus = dbState === 1 ? 'connected' : 'disconnected';
+    if (dbState !== 1) {
+      throw new Error('Database is not connected');
+    }
+    await mongoose.connection.db.admin().ping();
+    res.status(200).json({
+      status: 'healthy',
+      database: dbStatus,
+      uptime: process.uptime(),
+      timestamp: new Date(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      database: 'error',
+      error: error.message,
+      timestamp: new Date(),
+    });
+  }
 });
 
 app.post('/auth/signup', async (req, res) => {
@@ -128,6 +152,7 @@ app.post('/auth/signup', async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -149,6 +174,10 @@ app.post('/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    if (user.isActive === false) {
+      return res.status(401).json({ error: 'Your account has been deactivated' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -164,9 +193,11 @@ app.post('/auth/login', async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
+    console.error('[Login Error]', error);
     return res.status(500).json({ error: 'Unable to login' });
   }
 });
@@ -206,298 +237,12 @@ app.post('/auth/logout', async (req, res) => {
   }
 });
 
-app.post('/admin/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-    const admin = await Admin.findOne({ email: normalizedEmail });
-    if (!admin) {
-      return res.status(401).json({ error: 'Invalid admin credentials' });
-    }
-
-    const isMatch = await bcrypt.compare(password, admin.passwordHash);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid admin credentials' });
-    }
-
-    const accessToken = createAdminAccessToken(admin);
-    const refreshToken = createAdminRefreshToken(admin);
-
-    return res.json({
-      accessToken,
-      refreshToken,
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({ error: 'Unable to login as admin' });
-  }
-});
-
-app.post('/admin/auth/refresh', async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
-    if (!refreshToken) {
-      return res.status(401).json({ error: 'Refresh token is required' });
-    }
-
-    const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-    if (payload.role !== 'admin') {
-      return res.status(403).json({ error: 'Invalid admin refresh token' });
-    }
-
-    const admin = await Admin.findById(payload.adminId);
-    if (!admin) {
-      return res.status(403).json({ error: 'Invalid admin refresh token' });
-    }
-
-    return res.json({
-      accessToken: createAdminAccessToken(admin),
-      refreshToken: createAdminRefreshToken(admin),
-    });
-  } catch (error) {
-    return res.status(403).json({ error: 'Invalid admin refresh token' });
-  }
-});
-
-app.post('/admin/auth/logout', async (req, res) => {
-  try {
-    return res.status(204).send();
-  } catch (error) {
-    return res.status(500).json({ error: 'Unable to logout' });
-  }
-});
-
-app.get('/admin/stats', authenticateAdmin, async (req, res) => {
-  try {
-    const userCount = await User.countDocuments();
-    let ticketCountQuery = {};
-    if (req.admin.email !== 'admin@helpdesk.com') {
-      ticketCountQuery = { assignedTo: req.admin.adminId };
-    }
-    const ticketCount = await Ticket.countDocuments(ticketCountQuery);
-    res.json({ userCount, ticketCount });
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to load stats' });
-  }
-});
-
-app.get('/admin/list-admins', authenticateAdmin, async (req, res) => {
-  try {
-    if (req.admin.email !== 'admin@helpdesk.com') {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-    const admins = await Admin.find({}, 'name email _id');
-    res.json(admins);
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to fetch admins' });
-  }
-});
-
-app.get('/admin/users', authenticateAdmin, async (req, res) => {
-  try {
-    const users = await User.find().select('name email createdAt').sort({ createdAt: -1 });
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to load users' });
-  }
-});
-
-app.delete('/admin/users/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    await Ticket.deleteMany({ user_email: user.email });
-    res.status(200).json({ message: 'User deleted' });
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to delete user' });
-  }
-});
-
-// To get tickets of each admin
-app.get('/admin/users/:id/tickets', authenticateAdmin, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select('name email');
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    let ticketQuery = { user_email: user.email };
-    if (req.admin.email !== 'admin@helpdesk.com') {
-      ticketQuery.assignedTo = req.admin.adminId;
-    }
-
-    const tickets = await Ticket.find(ticketQuery).sort({ _id: -1 });
-    res.json({ user, tickets });
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to load user tickets' });
-  }
-});
-
-// All tickets are visible to super admin
-app.get('/admin/tickets', authenticateAdmin, async (req, res) => {
-  try {
-    let query = {};
-    if (req.admin.email !== 'admin@helpdesk.com') {
-      query = { assignedTo: req.admin.adminId };
-    }
-    const tickets = await Ticket.find(query).sort({ _id: -1 });
-    res.json(tickets);
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to load tickets' });
-  }
-});
-
-app.get('/admin/tickets/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const ticket = await Ticket.findById(req.params.id).populate('assignedTo', 'name email');
-    if (!ticket) {
-      return res.status(404).json({ error: 'Ticket not found' });
-    }
-    if (req.admin.email !== 'admin@helpdesk.com' && ticket.assignedTo?._id?.toString() !== req.admin.adminId) {
-      return res.status(403).json({ error: 'Not authorized to view this ticket' });
-    }
-    res.json(ticket);
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to load ticket' });
-  }
-});
-
-app.put('/admin/tickets/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const ticket = await Ticket.findById(req.params.id);
-    if (!ticket) {
-      return res.status(404).json({ error: 'Ticket not found' });
-    }
-
-    const { title, body, priority } = req.body;
-    const payload = {
-      title: title ?? ticket.title,
-      body: body ?? ticket.body,
-      priority: priority ?? ticket.priority,
-      user_email: ticket.user_email,
-    };
-
-    const validation = validateTicket(payload);
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.errors.join(', ') });
-    }
-
-    ticket.title = payload.title;
-    ticket.body = payload.body;
-    ticket.priority = payload.priority;
-    await ticket.save();
-
-    res.json(ticket);
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to update ticket' });
-  }
-});
-
-app.delete('/admin/tickets/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const ticket = await Ticket.findByIdAndDelete(req.params.id);
-    if (!ticket) {
-      return res.status(404).json({ error: 'Ticket not found' });
-    }
-    res.status(200).json({ message: 'Ticket deleted' });
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to delete ticket' });
-  }
-});
-
-app.patch('/admin/tickets/:id/status', authenticateAdmin, async (req, res) => {
-  try {
-    const { status } = req.body;
-    const validStatuses = ['open', 'in_progress', 'resolved', 'closed'];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ error: 'Invalid status provided.' });
-    }
-
-    const ticket = await Ticket.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-
-    if (!ticket) {
-      return res.status(404).json({ error: 'Ticket not found' });
-    }
-
-    res.json(ticket);
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to update ticket status' });
-  }
-});
-
-app.patch('/admin/tickets/:id/assign', authenticateAdmin, async (req, res) => {
-  try {
-    if (req.admin.email !== 'admin@helpdesk.com') {
-      return res.status(403).json({ error: 'Only super admin can assign tickets' });
-    }
-
-    const { adminId } = req.body;
-    
-    // Allow assigning to null (unassigned)
-    const newAssignment = adminId ? adminId : null;
-
-    const ticket = await Ticket.findByIdAndUpdate(
-      req.params.id,
-      { assignedTo: newAssignment },
-      { new: true }
-    ).populate('assignedTo', 'name email');
-
-    if (!ticket) {
-      return res.status(404).json({ error: 'Ticket not found' });
-    }
-
-    res.json(ticket);
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to assign admin' });
-  }
-});
-
-app.post('/admin/tickets/:id/replies', authenticateAdmin, async (req, res) => {
-  try {
-    const { body } = req.body;
-    if (!body) {
-      return res.status(400).json({ error: 'Reply body is required' });
-    }
-    
-    const ticket = await Ticket.findById(req.params.id);
-    if (!ticket) {
-      return res.status(404).json({ error: 'Ticket not found' });
-    }
-
-    ticket.replies.push({
-      body,
-      sender: 'admin',
-      sender_email: req.admin.email, 
-    });
-
-    await ticket.save();
-    res.status(201).json(ticket);
-  } catch (error) {
-    res.status(500).json({ error: 'Unable to add reply' });
-  }
-});
-
 app.get('/tickets', authenticateToken, async (req, res) => {
   try {
-    const all = await Ticket.find({ user_email: req.user.email });
-    res.json(all);
+    const result = await getTicketsWithQuery(req, { user_email: req.user.email });
+    res.json(result);
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -505,7 +250,7 @@ app.get('/tickets/:id', authenticateToken, authorizeTicketOwner, async (req, res
   try {
     res.json(req.ticket);
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -518,9 +263,10 @@ app.post('/tickets', authenticateToken, async (req, res) => {
     }
     const newTicket = buildTicketDocument(payload);
     await newTicket.save();
+
     res.status(201).json(newTicket);
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -529,29 +275,232 @@ app.delete('/tickets/:id', authenticateToken, authorizeTicketOwner, async (req, 
     await Ticket.findByIdAndDelete(req.ticket._id);
     res.status(200).json({ message: 'Ticket deleted' });
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-app.post('/tickets/:id/replies', authenticateToken, authorizeTicketOwner, async (req, res) => {
+app.get('/dashboard', authenticateToken, async (req, res) => {
   try {
-    const { body } = req.body;
-    if (!body) {
-      return res.status(400).json({ error: 'Reply body is required' });
+    if (req.user.role === 'admin') {
+      const [tickets, users] = await Promise.all([
+        Ticket.find({}),
+        User.find({}).select('-passwordHash'),
+      ]);
+      return res.json({
+        role: 'admin',
+        tickets,
+        users,
+      });
+    } else {
+      const tickets = await Ticket.find({ user_email: req.user.email });
+      return res.json({
+        role: 'user',
+        tickets,
+      });
+    }
+  } catch (error) {
+    console.error('[Dashboard Error]', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─── Admin Routes ────────────────────────────────────────
+
+app.get('/admin/tickets', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const result = await getTicketsWithQuery(req, {});
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/admin/users', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const users = await User.find({}).select('-passwordHash');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.patch('/admin/users/:id/make-admin', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    if (user.role === 'admin') {
+      return res.status(400).json({ error: 'User is already an admin' });
+    }
+    user.role = 'admin';
+    await user.save();
+    return res.json({ message: 'User promoted to admin', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// User Management Routes
+app.patch('/admin/users/:id/toggle-active', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.role === 'admin' && user._id.toString() === req.user.userId) {
+      return res.status(400).json({ error: 'You cannot deactivate yourself' });
+    }
+    user.isActive = !user.isActive;
+    await user.save();
+    res.json({ message: `User is now ${user.isActive ? 'active' : 'inactive'}`, user });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.patch('/admin/users/:id/reset-password', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    user.passwordHash = passwordHash;
+    await user.save();
+    res.json({ message: 'Password reset successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/admin/users/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.role === 'admin') {
+      return res.status(400).json({ error: 'Admins cannot be deleted directly' });
+    }
+    await Ticket.deleteMany({ user_email: user.email });
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'User and all associated tickets deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Profile route
+app.patch('/users/profile', authenticateToken, async (req, res) => {
+  try {
+    const { name, password } = req.body;
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (name) {
+      user.name = name.trim();
+    }
+    if (password) {
+      if (password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters' });
+      }
+      user.passwordHash = await bcrypt.hash(password, 10);
+    }
+    await user.save();
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Ticket status, comments, assign agents
+app.patch('/tickets/:id/status', authenticateToken, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['open', 'in progress', 'closed'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+
+    if (req.user.role !== 'admin' && ticket.user_email !== req.user.email) {
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const ticket = req.ticket; // set by authorizeTicketOwner
-    ticket.replies.push({
-      body,
-      sender: 'user',
-      sender_email: req.user.email,
-    });
-
+    ticket.status = status;
+    if (status === 'resolved') {
+      ticket.resolvedAt = new Date();
+    } else if (status === 'closed') {
+      ticket.closedAt = new Date();
+    }
     await ticket.save();
-    res.status(201).json(ticket);
+
+    res.json(ticket);
   } catch (error) {
-    res.status(500).json({ error: 'Unable to add reply' });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-app.listen(4000, () => console.log('Backend running on http://localhost:4000'));
+app.patch('/tickets/:id/assign', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { assignedToEmail } = req.body;
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+
+    let assignedToUser = null;
+    if (assignedToEmail) {
+      assignedToUser = await User.findOne({ email: assignedToEmail });
+      if (!assignedToUser) {
+        return res.status(400).json({ error: 'Agent not found' });
+      }
+    }
+
+    ticket.assignedTo = assignedToUser ? assignedToUser._id : null;
+    ticket.assignedToEmail = assignedToUser ? assignedToUser.email : null;
+    await ticket.save();
+
+    res.json(ticket);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/tickets/:id/comments', authenticateToken, async (req, res) => {
+  try {
+    const { body } = req.body;
+    if (!body || body.trim() === '') {
+      return res.status(400).json({ error: 'Comment body is required' });
+    }
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+
+    if (req.user.role !== 'admin' && ticket.user_email !== req.user.email) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const newComment = {
+      authorName: req.user.name || req.user.email,
+      authorEmail: req.user.email,
+      body: body.trim(),
+      createdAt: new Date(),
+    };
+
+    ticket.comments.push(newComment);
+    await ticket.save();
+
+    res.status(201).json(ticket);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));

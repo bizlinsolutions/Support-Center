@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { User } = require('../data/userSchema');
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 
@@ -6,7 +7,7 @@ if (!ACCESS_TOKEN_SECRET) {
   throw new Error('Missing ACCESS_TOKEN_SECRET in environment');
 }
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.startsWith('Bearer ')
     ? authHeader.split(' ')[1]
@@ -19,6 +20,15 @@ function authenticateToken(req, res, next) {
   try {
     const payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
     req.user = payload;
+
+    const dbUser = await User.findById(payload.userId);
+    if (!dbUser) {
+      return res.status(401).json({ error: 'User does not exist' });
+    }
+    if (!dbUser.isActive) {
+      return res.status(401).json({ error: 'Account deactivated' });
+    }
+
     return next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired access token' });

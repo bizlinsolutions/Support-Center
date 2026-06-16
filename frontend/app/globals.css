@@ -1,0 +1,553 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+}
+
+:root {
+  --background: #f1f5f9;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --input-bg: #ffffff;
+  --input-text: #0f172a;
+  --nav-bg: #ffffff;
+  --shadow-color: rgba(148, 163, 184, 0.1);
+  --success-bg: #ecfdf5;
+  --success-text: #047857;
+  --danger-bg: #fef2f2;
+  --danger-text: #b91c1c;
+}
+
+.dark {
+  --background: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --card-bg: #1e293b;
+  --border-color: #334155;
+  --input-bg: #0f172a;
+  --input-text: #f8fafc;
+  --nav-bg: #1e293b;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --success-bg: #064e3b;
+  --success-text: #34d399;
+  --danger-bg: #7f1d1d;
+  --danger-text: #fca5a5;
+}
+
+@layer base {
+
+  input,
+  textarea,
+  select {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--input-text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    width: 100%;
+    display: block;
+    margin: 8px 0;
+    transition: all 0.2s;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+}
+
+/* base styles */
+body {
+  background-color: var(--background);
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-geist-sans), sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+h1 {
+  @apply text-2xl font-extrabold tracking-tight;
+}
+
+h2 {
+  @apply text-xl font-bold;
+}
+
+main {
+  @apply w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+p>a {
+  @apply text-primary hover:text-primary-hover underline transition-colors;
+}
+
+/* Nav styles */
+nav {
+  border-color: var(--border-color);
+}
+
+
+/* Card styles */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.25rem 0;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+}
+
+.card h3 {
+  @apply font-bold text-lg mb-2;
+}
+
+.card p {
+  color: var(--text-muted);
+  @apply my-3 text-sm leading-relaxed;
+}
+
+/* Button styles */
+button {
+  @apply px-4 py-2.5 rounded-lg flex justify-between items-center gap-2 text-sm font-semibold transition-all cursor-pointer;
+}
+
+button:hover {
+  @apply opacity-90;
+}
+
+.btn-primary {
+  @apply bg-primary text-white hover:bg-primary-hover;
+}
+
+.btn-secondary {
+  background-color: var(--border-color);
+  color: var(--text-main);
+}
+
+.btn-outline {
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background-color: var(--border-color);
+}
+
+/* Form styles */
+form {
+  @apply py-6 px-8 rounded-xl block mx-auto w-full max-w-lg;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 15px -3px var(--shadow-color);
+}
+
+form label {
+  @apply block mb-4 text-sm font-semibold text-left;
+  color: var(--text-main);
+}
+
+/* Feedback styles */
+.error {
+  border: 1px solid var(--danger-text);
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+  @apply py-3 px-4 rounded-lg block max-w-md my-4 mx-auto text-sm font-semibold text-center;
+}
+
+/* Pill styles */
+.pill {
+  @apply py-1 px-3 inline-block text-[11px] font-bold rounded-full uppercase tracking-wider;
+}
+
+.pill.high {
+  @apply bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300;
+}
+
+.pill.medium {
+  @apply bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300;
+}
+
+.pill.low {
+  @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300;
+}
+
+.card .pill {
+  @apply absolute bottom-3 right-3;
+}
+
+/* ─── Dashboard Semantic Classes ─────────────────────────── */
+
+.dashboard-welcome-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.05) 50%, rgba(16, 185, 129, 0.05) 100%);
+  border: 1px solid var(--border-color);
+  @apply p-8 rounded-2xl mb-8 transition-all duration-300;
+}
+
+.dashboard-welcome-card-plain {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  @apply p-8 rounded-2xl mb-8 transition-all duration-300;
+}
+
+.dashboard-title {
+  @apply text-3xl font-extrabold tracking-tight;
+}
+
+.dashboard-subtitle {
+  color: var(--text-muted);
+  @apply text-sm max-w-2xl mt-1;
+}
+
+.badge-admin {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-purple-100 text-purple-700 tracking-wide dark:bg-purple-900/40 dark:text-purple-300;
+}
+
+/* Stats Row */
+.stats-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8;
+}
+
+.stat-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+}
+
+.stat-card-purple {
+  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(168, 85, 247, 0.03) 100%);
+  border: 1px solid var(--border-color);
+  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+}
+
+.stat-card-red {
+  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.03) 100%);
+  border: 1px solid var(--border-color);
+  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+}
+
+.stat-card-blue {
+  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.03) 100%);
+  border: 1px solid var(--border-color);
+  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+}
+
+.stat-card-emerald {
+  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.03) 100%);
+  border: 1px solid var(--border-color);
+  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+}
+
+.stat-card-label {
+  color: var(--text-muted);
+  @apply text-xs font-bold uppercase tracking-wider;
+}
+
+.stat-card-label-purple {
+  @apply text-xs font-bold text-purple-600 uppercase tracking-wider dark:text-purple-400;
+}
+
+.stat-card-label-red {
+  @apply text-xs font-bold text-red-600 uppercase tracking-wider dark:text-red-400;
+}
+
+.stat-card-label-blue {
+  @apply text-xs font-bold text-blue-600 uppercase tracking-wider dark:text-blue-400;
+}
+
+.stat-card-label-emerald {
+  @apply text-xs font-bold text-emerald-600 uppercase tracking-wider dark:text-emerald-400;
+}
+
+.stat-card-value {
+  @apply text-3xl font-extrabold mt-2;
+}
+
+.stat-card-value-purple {
+  @apply text-3xl font-extrabold text-purple-700 dark:text-purple-400 mt-2;
+}
+
+.stat-card-value-red {
+  @apply text-3xl font-extrabold text-red-700 dark:text-red-400 mt-2;
+}
+
+.stat-card-value-blue {
+  @apply text-3xl font-extrabold text-blue-700 dark:text-blue-400 mt-2;
+}
+
+.stat-card-value-emerald {
+  @apply text-3xl font-extrabold text-emerald-700 dark:text-emerald-400 mt-2;
+}
+
+.section-heading {
+  @apply text-xl font-bold mb-4 flex items-center gap-2;
+}
+
+/* Tables */
+.table-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  @apply rounded-2xl shadow-sm overflow-hidden;
+}
+
+.table-header-row {
+  background-color: rgba(148, 163, 184, 0.05);
+  border-b: 1px solid var(--border-color);
+}
+
+.table-header-cell {
+  color: var(--text-muted);
+  @apply text-left py-3.5 px-5 font-bold text-xs uppercase tracking-wider;
+}
+
+.table-header-cell-right {
+  color: var(--text-muted);
+  @apply text-right py-3.5 px-5 font-bold text-xs uppercase tracking-wider;
+}
+
+.table-row {
+  border-b: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.table-row:hover {
+  background-color: rgba(148, 163, 184, 0.02);
+}
+
+.table-cell {
+  color: var(--text-main);
+  @apply py-4 px-5 text-sm;
+}
+
+.table-cell-bold {
+  color: var(--text-main);
+  @apply py-4 px-5 font-bold text-sm;
+}
+
+.table-cell-right {
+  @apply py-4 px-5 text-right;
+}
+
+.badge-role-admin {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wide bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300;
+}
+
+.badge-role-user {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wide bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300;
+}
+
+.btn-make-admin {
+  @apply bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg transition-all disabled:opacity-50 cursor-pointer;
+}
+
+/* Ticket group */
+.ticket-group-header {
+  @apply flex items-center gap-2 mb-3 mt-6;
+}
+
+.ticket-group-avatar {
+  @apply w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center;
+}
+
+.ticket-group-avatar-letter {
+  @apply text-xs font-bold text-primary;
+}
+
+.ticket-group-email {
+  @apply text-sm font-bold;
+}
+
+.ticket-group-count {
+  @apply text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold dark:bg-slate-800 dark:text-slate-400;
+}
+
+.ticket-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  @apply p-4 rounded-xl shadow-sm hover:shadow-md transition-all;
+}
+
+.ticket-card-title {
+  @apply text-sm font-bold;
+}
+
+.ticket-card-body {
+  color: var(--text-muted);
+  @apply text-xs mt-1 line-clamp-2;
+}
+
+.badge-high {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300;
+}
+
+.badge-medium {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300;
+}
+
+.badge-low {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300;
+}
+
+.badge-status-open {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300;
+}
+
+.badge-status-in-progress {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300;
+}
+
+.badge-status-resolved {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300;
+}
+
+.badge-status-closed {
+  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300;
+}
+
+.empty-state {
+  @apply bg-slate-50/50 border border-dashed border-slate-300 p-8 rounded-2xl text-center dark:bg-slate-900/20 dark:border-slate-800;
+}
+
+.empty-state-text {
+  color: var(--text-muted);
+  @apply text-sm;
+}
+
+.quick-actions-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  @apply mt-8 p-6 rounded-2xl shadow-sm;
+}
+
+.quick-actions-title {
+  @apply text-lg font-bold mb-4;
+}
+
+.quick-actions-row {
+  @apply flex gap-4 flex-wrap;
+}
+
+/* User dashboard recent tickets panel */
+.recent-tickets-grid {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-8;
+}
+
+.recent-tickets-list {
+  @apply lg:col-span-2;
+}
+
+.recent-ticket-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all relative;
+}
+
+.recent-ticket-title {
+  @apply text-base font-bold;
+}
+
+.recent-ticket-body {
+  color: var(--text-muted);
+  @apply text-sm my-2 line-clamp-2;
+}
+
+.recent-ticket-meta {
+  color: var(--text-muted);
+  @apply text-[11px] mt-3 flex justify-between;
+}
+
+.quick-actions-panel {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  @apply p-6 rounded-2xl shadow-sm space-y-4;
+}
+
+.btn-full-outline {
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  @apply w-full flex justify-center items-center gap-2 py-3 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer text-sm;
+}
+
+.btn-full-primary {
+  @apply w-full bg-primary text-white flex justify-center items-center gap-2 py-3 rounded-xl font-semibold shadow-sm hover:bg-primary-hover transition-all cursor-pointer;
+}
+
+.support-info-box {
+  border-top: 1px solid var(--border-color);
+  color: var(--text-muted);
+  @apply pt-4 mt-4 text-xs leading-relaxed;
+}
+
+/* Mega dropdown / Ecommerce style dropdown */
+.dropdown-menu {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 25px -5px var(--shadow-color);
+  @apply absolute top-full left-0 mt-2 w-72 rounded-xl py-3 z-50 origin-top-left transition-all duration-200;
+}
+
+.dropdown-item {
+  color: var(--text-main);
+  @apply px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex flex-col transition-all;
+}
+
+.dropdown-item-title {
+  @apply text-xs font-bold;
+}
+
+.dropdown-item-desc {
+  color: var(--text-muted);
+  @apply text-[10px] mt-0.5;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(30, 41, 59, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+}

@@ -22,22 +22,43 @@ const ticketSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['open', 'in_progress', 'resolved', 'closed'],
+    enum: ['open', 'in progress', 'closed'],
     default: 'open',
   },
   assignedTo: {
     type: Schema.Types.ObjectId,
-    ref: 'Admin',
+    ref: 'User',
     default: null,
   },
-  replies: [
+  assignedToEmail: {
+    type: String,
+    default: null,
+  },
+  resolvedAt: {
+    type: Date,
+    default: null,
+  },
+  closedAt: {
+    type: Date,
+    default: null,
+  },
+  comments: [
     {
-      body: { type: String, required: true },
-      sender: { type: String, required: true }, // 'user' or 'admin'
-      sender_email: { type: String },
+      authorName: String,
+      authorEmail: String,
+      body: String,
       createdAt: { type: Date, default: Date.now },
     }
+  ],
+  attachments: [
+    {
+      name: String,
+      data: String,
+      mimeType: String,
+    }
   ]
+}, {
+  timestamps: true
 });
 
 const Ticket = model('Ticket', ticketSchema);
@@ -58,6 +79,8 @@ function buildTicketDocument(data) {
     body: data.body,
     priority: data.priority,
     user_email: data.user_email,
+    status: data.status || 'open',
+    attachments: data.attachments || [],
   });
 }
 
