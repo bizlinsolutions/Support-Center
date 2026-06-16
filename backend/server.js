@@ -324,6 +324,19 @@ app.get('/admin/users', authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
+app.get('/admin/users/:id/tickets', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-passwordHash');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const result = await getTicketsWithQuery(req, { user_email: user.email });
+    res.json({ user, ...result });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.patch('/admin/users/:id/make-admin', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
