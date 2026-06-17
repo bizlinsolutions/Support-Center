@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../data/userSchema');
+const { User, Admin } = require('../data/userSchema');
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 
@@ -21,7 +21,9 @@ async function authenticateToken(req, res, next) {
     const payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
     req.user = payload;
 
-    const dbUser = await User.findById(payload.userId);
+    const Model = payload.collection === 'Admin' ? Admin : User;
+    const dbUser = await Model.findById(payload.userId);
+    
     if (!dbUser) {
       return res.status(401).json({ error: 'User does not exist' });
     }

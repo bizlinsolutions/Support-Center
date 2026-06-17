@@ -45,7 +45,7 @@ function Bar({ label, value, max, color, sublabel }) {
 // ─── Stat card ────────────────────────────────────────────────
 function StatCard({ icon, label, value, sub, accent }) {
   return (
-    <div className={`bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all`}>
+    <div className={`bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-sm hover:shadow-md transition-all`}>
       <div className="flex items-start justify-between">
         <div>
           <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider block ${accent}`}>
@@ -204,7 +204,7 @@ export default function AdminAnalytics() {
 
       {/* ─ Header ─────────────────────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-850 dark:text-white">
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-800 dark:text-white">
           Analytics Dashboard
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
@@ -270,7 +270,7 @@ export default function AdminAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* ── 1. Tickets per user ──────────────────────────────── */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-xl shadow-sm">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
               <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -304,7 +304,7 @@ export default function AdminAnalytics() {
         </div>
 
         {/* ── 2. Resolution rate ───────────────────────────────── */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-xl shadow-sm">
           <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2 mb-5">
             <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -345,7 +345,7 @@ export default function AdminAnalytics() {
         </div>
 
         {/* ── 3. Most common priority ──────────────────────────── */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-xl shadow-sm">
           <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2 mb-5">
             <svg className="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -388,7 +388,7 @@ export default function AdminAnalytics() {
         </div>
 
         {/* ── 4. Oldest open tickets ───────────────────────────── */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-xl shadow-sm">
           <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2 mb-5">
             <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -415,7 +415,7 @@ export default function AdminAnalytics() {
                   t.ageDays >= 7  ? 'bg-amber-500' :
                                     'bg-slate-400';
                 return (
-                  <div key={t._id || i} className="flex items-center gap-3">
+                  <div key={t.publicId || i} className="flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{t.title || t.subject || 'Untitled'}</p>
                       <div className="mt-1 w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -438,7 +438,7 @@ export default function AdminAnalytics() {
       </div>
 
       {/* ── 5. This week vs last week ─────────────────────────── */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-xl shadow-sm">
         <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2 mb-6">
           <svg className="w-4 h-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
@@ -448,14 +448,14 @@ export default function AdminAnalytics() {
 
         <div className="grid grid-cols-2 gap-6">
           {/* This week */}
-          <div className="flex flex-col items-center justify-center py-6 bg-violet-50 dark:bg-violet-900/20 rounded-2xl border border-violet-100 dark:border-violet-800/40">
+          <div className="flex flex-col items-center justify-center py-6 bg-violet-50 dark:bg-violet-900/20 rounded-xl border border-violet-100 dark:border-violet-800/40">
             <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider mb-2">This Week</span>
             <span className="text-4xl font-extrabold text-violet-700 dark:text-violet-300">{thisWeekCount}</span>
             <span className="text-xs text-slate-400 mt-1">tickets</span>
           </div>
 
           {/* Last week */}
-          <div className="flex flex-col items-center justify-center py-6 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-700/40">
+          <div className="flex flex-col items-center justify-center py-6 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700/40">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Last Week</span>
             <span className="text-4xl font-extrabold text-slate-700 dark:text-slate-300">{lastWeekCount}</span>
             <span className="text-xs text-slate-400 mt-1">tickets</span>

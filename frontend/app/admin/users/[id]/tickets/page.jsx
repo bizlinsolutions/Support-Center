@@ -37,26 +37,15 @@ export default function UserTicketsPage() {
       return;
     }
 
-    // 2. Fetch user details and their tickets
+    // 2. Fetch user details and their tickets via dedicated endpoint
     const fetchData = async () => {
       try {
-        // Fetch all users to find this user
-        const usersList = await fetchClient('/admin/users');
-        const foundUser = usersList.find(u => u._id === id);
-        
-        if (!foundUser) {
-          showToast('User not found', 'error');
-          router.push('/admin/users');
-          return;
-        }
-        setUser(foundUser);
-
-        // Fetch all tickets to filter for this user
-        const ticketsData = await fetchClient('/admin/tickets?limit=500');
-        const userTickets = (ticketsData.tickets || []).filter(t => t.user_email === foundUser.email);
-        setTickets(userTickets);
+        const data = await fetchClient(`/admin/users/${id}/tickets`);
+        setUser(data.user);
+        setTickets(data.tickets || []);
       } catch (err) {
         showToast(err.message || 'Failed to fetch user ticket data', 'error');
+        router.push('/admin/users');
       } finally {
         setLoading(false);
       }
@@ -106,14 +95,14 @@ export default function UserTicketsPage() {
       </div>
 
       {/* Profile Header */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg flex-shrink-0">
             {getInitials(user?.name)}
           </div>
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-xl md:text-2xl font-extrabold text-slate-850 dark:text-white leading-none">{user?.name}</h2>
+              <h2 className="text-xl md:text-2xl font-extrabold text-slate-800 dark:text-white leading-none">{user?.name}</h2>
               <span className={`text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${user?.role === 'admin'
                   ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
                   : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
@@ -156,7 +145,7 @@ export default function UserTicketsPage() {
         </h3>
 
         {tickets.length === 0 ? (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-12 rounded-2xl text-center shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-12 rounded-xl text-center shadow-sm">
             <svg className="w-16 h-16 text-slate-200 dark:text-slate-800 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -165,10 +154,10 @@ export default function UserTicketsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {tickets.map((ticket) => (
-              <div key={ticket._id} className="group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-sm hover:shadow-md transition-all">
-                <Link href={`/tickets/${ticket._id}`} className="block space-y-3">
+              <div key={ticket.publicId} className="group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-sm hover:shadow-md transition-all">
+                <Link href={`/tickets/${ticket.publicId}`} className="block space-y-3">
                   <div className="flex justify-between items-start gap-4">
-                    <h4 className="text-sm font-bold text-slate-850 dark:text-white truncate group-hover:text-primary transition-colors">
+                    <h4 className="text-sm font-bold text-slate-800 dark:text-white truncate group-hover:text-primary transition-colors">
                       {ticket.title}
                     </h4>
                     <div className="flex gap-2 items-center flex-shrink-0">

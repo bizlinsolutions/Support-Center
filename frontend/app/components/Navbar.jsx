@@ -70,7 +70,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center px-4 md:px-6">
+    <header className="fixed top-0 left-[220px] right-0 h-16 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center px-4 md:px-6">
       {/* Mobile Drawer Trigger (Hamburger) */}
       {user && (
         <button
@@ -86,20 +86,9 @@ export default function Navbar() {
 
       {/* Left branding */}
       <div className="flex items-center gap-3">
-        <Link href="/" className="flex items-center gap-2.5">
-          <Image
-            src={Logo}
-            alt='DeskFlow Helpdesk Logo'
-            width={36}
-            height={36}
-            className="rounded-lg shadow-sm"
-            quality={100}
-            priority
-          />
-          <span className="text-base font-extrabold text-primary font-sans tracking-tight">
-            DeskFlow
-          </span>
-        </Link>
+        <span className="text-lg font-extrabold text-slate-800 dark:text-white tracking-tight">
+          DeskFlow Helpdesk
+        </span>
       </div>
 
       {/* Center Search Bar */}
@@ -117,7 +106,7 @@ export default function Navbar() {
                 placeholder="Search tickets..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-full text-slate-850 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+                className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-full text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
               />
             </div>
           </form>
@@ -125,7 +114,16 @@ export default function Navbar() {
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-2 md:gap-3">
+      <div className="flex items-center gap-3 md:gap-4">
+        {/* Quick Add Button */}
+        {user && (
+          <Link href="/tickets/create" className="hidden sm:flex bg-primary text-white p-2 rounded-lg hover:bg-primary-hover shadow-sm transition-all" title="New Ticket">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+          </Link>
+        )}
+
         {/* Dark Mode Toggle */}
         <button
           onClick={toggleDarkMode}

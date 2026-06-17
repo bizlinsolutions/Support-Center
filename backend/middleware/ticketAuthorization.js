@@ -4,9 +4,9 @@ async function authorizeTicketOwner(req, res, next) {
   try {
     let ticket;
     if (req.user && req.user.role === 'admin') {
-      ticket = await Ticket.findById(req.params.id);
+      ticket = await Ticket.findOne({ publicId: req.params.id });
     } else {
-      ticket = await Ticket.findOne({ _id: req.params.id, user_email: req.user.email });
+      ticket = await Ticket.findOne({ publicId: req.params.id, userId: req.user.userId });
     }
 
     if (!ticket) {

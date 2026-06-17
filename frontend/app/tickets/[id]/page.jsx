@@ -159,46 +159,57 @@ export default function TicketDetails() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Main Ticket Card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
-              <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                  Ticket #{ticket._id.substring(ticket._id.length - 6)}
-                </span>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-slate-850 dark:text-white leading-tight">
-                  {ticket.title}
-                </h2>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+            <div className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-6">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-1 rounded-md tracking-wider">
+                      #{ticket.publicId}
+                    </span>
+                    <span className="text-slate-400 dark:text-slate-500 text-sm font-medium">
+                      Created {getRelativeTimeString(ticket.createdAt)}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white leading-tight">
+                    {ticket.title}
+                  </h2>
+                </div>
+                
+                <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 flex-shrink-0">
+                  <span className={`pill ${ticket.priority}`}>
+                    {ticket.priority} priority
+                  </span>
+                  <span className={`badge-status-${ticket.status.replace(' ', '-')}`}>
+                    {ticket.status}
+                  </span>
+                </div>
               </div>
-              
-              <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 flex-shrink-0">
-                <span className={`pill ${ticket.priority}`}>
-                  {ticket.priority} priority
-                </span>
-                <span className={`badge-status-${ticket.status.replace(' ', '-')}`}>
-                  {ticket.status}
-                </span>
+
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 font-medium">
+                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-500 dark:text-slate-400">
+                  {ticket.user_email.charAt(0).toUpperCase()}
+                </div>
+                <span>Requested by <strong className="text-slate-800 dark:text-white">{ticket.user_email}</strong></span>
               </div>
             </div>
 
-            <div className="border-t border-b border-slate-100 dark:border-slate-800 py-3 my-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500 font-semibold">
-              <span>Created: <strong>{getRelativeTimeString(ticket.createdAt)}</strong></span>
-              <span>By: <strong>{ticket.user_email}</strong></span>
+            <div className="p-6">
+              <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base whitespace-pre-line leading-relaxed font-medium">
+                {ticket.body}
+              </p>
             </div>
-
-            <p className="text-slate-600 dark:text-slate-300 text-sm whitespace-pre-line leading-relaxed mb-6 font-medium">
-              {ticket.body}
-            </p>
 
             {/* Delete button (Admin or Owner) */}
             {user && (user.email === ticket.user_email || user.role === 'admin') && (
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                <DeleteButton ticketId={ticket._id} />
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end px-6 pb-6">
+                <DeleteButton ticketId={ticket.publicId} />
               </div>
             )}
           </div>
 
           {/* Comments/Replies Thread */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
             <h3 className="text-base font-bold mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -215,9 +226,9 @@ export default function TicketDetails() {
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-slate-800 dark:text-slate-200">{comment.authorName}</span>
                         {comment.authorEmail === ticket.user_email ? (
-                          <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-100 text-blue-700 rounded uppercase">Owner</span>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded uppercase">Owner</span>
                         ) : (
-                          <span className="text-[9px] font-bold px-1.5 py-0.2 bg-purple-100 text-purple-700 rounded uppercase">Staff</span>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded uppercase">Staff</span>
                         )}
                       </div>
                       <span className="text-slate-400 dark:text-slate-500">{getRelativeTimeString(comment.createdAt)}</span>
@@ -228,7 +239,7 @@ export default function TicketDetails() {
                   </div>
                 ))
               ) : (
-                <p className="text-center text-xs text-slate-455 py-4 font-semibold">No comments or replies yet. Post one below!</p>
+                <p className="text-center text-xs text-slate-500 py-4 font-semibold">No comments or replies yet. Post one below!</p>
               )}
             </div>
 
@@ -260,9 +271,41 @@ export default function TicketDetails() {
 
         {/* Sidebar Settings Column */}
         <div className="space-y-6">
+          {/* Timeline / Info Block */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-xl shadow-sm space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Timeline</h3>
+            <div className="space-y-4 relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-700 before:to-transparent">
+              <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                <div className="flex items-center justify-center w-4 h-4 rounded-full border border-white dark:border-slate-900 bg-primary text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2"></div>
+                <div className="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] pl-4 md:pl-0 md:group-odd:pr-4 md:group-even:pl-4">
+                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Ticket Created</div>
+                  <div className="text-[10px] text-slate-500">{new Date(ticket.createdAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+              {ticket.resolvedAt && (
+                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                  <div className="flex items-center justify-center w-4 h-4 rounded-full border border-white dark:border-slate-900 bg-green-500 text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2"></div>
+                  <div className="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] pl-4 md:pl-0 md:group-odd:pr-4 md:group-even:pl-4">
+                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Resolved</div>
+                    <div className="text-[10px] text-slate-500">{new Date(ticket.resolvedAt).toLocaleDateString()}</div>
+                  </div>
+                </div>
+              )}
+              {ticket.closedAt && (
+                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                  <div className="flex items-center justify-center w-4 h-4 rounded-full border border-white dark:border-slate-900 bg-slate-500 text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2"></div>
+                  <div className="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] pl-4 md:pl-0 md:group-odd:pr-4 md:group-even:pl-4">
+                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Closed</div>
+                    <div className="text-[10px] text-slate-500">{new Date(ticket.closedAt).toLocaleDateString()}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Ticket Settings / Actions */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm space-y-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-405">Settings</h3>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-xl shadow-sm space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Settings</h3>
 
             {/* Status Selector (Admins & Owners) */}
             {user && (user.role === 'admin' || user.email === ticket.user_email) && (
@@ -297,7 +340,7 @@ export default function TicketDetails() {
                 >
                   <option value="">-- Unassigned --</option>
                   {agents.map((agent) => (
-                    <option key={agent._id} value={agent.email}>
+                    <option key={agent.publicId || agent._id} value={agent.email}>
                       {agent.name} ({agent.email})
                     </option>
                   ))}

@@ -3,6 +3,10 @@ const { Schema, model } = require('mongoose');
 const PRIORITIES = ['low', 'medium', 'high'];
 
 const ticketSchema = new Schema({
+  publicId: {
+    type: String,
+    unique: true,
+  },
   title: {
     type: String,
     required: true,
@@ -15,6 +19,10 @@ const ticketSchema = new Schema({
     type: String,
     required: true,
     enum: PRIORITIES,
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
   },
   user_email: {
     type: String,
@@ -61,6 +69,16 @@ const ticketSchema = new Schema({
   timestamps: true
 });
 
+const generatePublicId = (prefix) => {
+  return prefix + '-' + Math.random().toString(36).substring(2, 8).toUpperCase() + Math.floor(Math.random() * 1000);
+};
+
+ticketSchema.pre('save', async function () {
+  if (!this.publicId) {
+    this.publicId = generatePublicId('TKT');
+  }
+});
+
 const Ticket = model('Ticket', ticketSchema);
 
 function validateTicket(data) {
@@ -78,6 +96,7 @@ function buildTicketDocument(data) {
     title: data.title,
     body: data.body,
     priority: data.priority,
+    userId: data.userId,
     user_email: data.user_email,
     status: data.status || 'open',
     attachments: data.attachments || [],

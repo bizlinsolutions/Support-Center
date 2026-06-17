@@ -9,7 +9,7 @@ const {
   validateTicket,
   buildTicketDocument,
 } = require('./data/schema');
-const { User } = require('./data/userSchema');
+const { User, Admin } = require('./data/userSchema');
 const { authenticateToken } = require('./middleware/auth');
 const { authorizeTicketOwner } = require('./middleware/ticketAuthorization');
 const { requireAdmin } = require('./middleware/adminAuth');
@@ -37,6 +37,7 @@ async function getTicketsWithQuery(req, queryBase = {}) {
 
   const total = await Ticket.countDocuments(query);
   const tickets = await Ticket.find(query)
+    .select('-_id')
     .sort(sortOptions)
     .skip(skip)
     .limit(limitNum);
@@ -71,22 +72,24 @@ if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '7d';
 
-function createAccessToken(user) {
+function createAccessToken(user, collection) {
   return jwt.sign(
     {
       userId: user._id.toString(),
+      publicId: user.publicId,
       email: user.email,
       name: user.name,
-      role: user.role,
+      role: collection === 'Admin' ? 'admin' : 'user',
+      collection,
     },
     ACCESS_TOKEN_SECRET,
     { expiresIn: ACCESS_TOKEN_EXPIRY }
   );
 }
 
-function createRefreshToken(user) {
+function createRefreshToken(user, collection) {
   return jwt.sign(
-    { userId: user._id.toString() },
+    { userId: user._id.toString(), collection },
     REFRESH_TOKEN_SECRET,
     { expiresIn: REFRESH_TOKEN_EXPIRY }
   );
@@ -130,8 +133,9 @@ app.post('/auth/signup', async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
     const existingUser = await User.findOne({ email: normalizedEmail });
-    if (existingUser) {
-      return res.status(409).json({ error: 'User already exists' });
+    const existingAdmin = await Admin.findOne({ email: normalizedEmail });
+    if (existingUser || existingAdmin) {
+      return res.status(409).json({ error: 'Email already in use' });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -141,18 +145,18 @@ app.post('/auth/signup', async (req, res) => {
       passwordHash,
     });
 
-    const accessToken = createAccessToken(user);
-    const refreshToken = createRefreshToken(user);
+    const accessToken = createAccessToken(user, 'User');
+    const refreshToken = createRefreshToken(user, 'User');
 
     return res.status(201).json({
       message: 'User created successfully',
       accessToken,
       refreshToken,
       user: {
-        id: user._id,
+        id: user.publicId,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: 'user',
       },
     });
   } catch (error) {
@@ -169,7 +173,16 @@ app.post('/auth/login', async (req, res) => {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    const user = await User.findOne({ email: normalizedEmail });
+    let user = await Admin.findOne({ email: normalizedEmail });
+    let collection = 'Admin';
+    let role = 'admin';
+
+    if (!user) {
+      user = await User.findOne({ email: normalizedEmail });
+      collection = 'User';
+      role = 'user';
+    }
+
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -183,17 +196,17 @@ app.post('/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const accessToken = createAccessToken(user);
-    const refreshToken = createRefreshToken(user);
+    const accessToken = createAccessToken(user, collection);
+    const refreshToken = createRefreshToken(user, collection);
 
     return res.json({
       accessToken,
       refreshToken,
       user: {
-        id: user._id,
+        id: user.publicId,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role,
       },
     });
   } catch (error) {
@@ -210,13 +223,15 @@ app.post('/auth/refresh', async (req, res) => {
     }
 
     const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-    const user = await User.findById(payload.userId);
+    const Model = payload.collection === 'Admin' ? Admin : User;
+    const user = await Model.findById(payload.userId);
+    
     if (!user) {
       return res.status(403).json({ error: 'Invalid refresh token' });
     }
 
-    const newAccessToken = createAccessToken(user);
-    const newRefreshToken = createRefreshToken(user);
+    const newAccessToken = createAccessToken(user, payload.collection);
+    const newRefreshToken = createRefreshToken(user, payload.collection);
 
     console.log(`[Auth] Refresh token used for user: ${payload.userId}`);
 
@@ -239,7 +254,7 @@ app.post('/auth/logout', async (req, res) => {
 
 app.get('/tickets', authenticateToken, async (req, res) => {
   try {
-    const result = await getTicketsWithQuery(req, { user_email: req.user.email });
+    const result = await getTicketsWithQuery(req, { userId: req.user.userId });
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -248,7 +263,9 @@ app.get('/tickets', authenticateToken, async (req, res) => {
 
 app.get('/tickets/:id', authenticateToken, authorizeTicketOwner, async (req, res) => {
   try {
-    res.json(req.ticket);
+    const ticketObj = req.ticket.toObject();
+    delete ticketObj._id;
+    res.json(ticketObj);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -256,7 +273,7 @@ app.get('/tickets/:id', authenticateToken, authorizeTicketOwner, async (req, res
 
 app.post('/tickets', authenticateToken, async (req, res) => {
   try {
-    const payload = { ...req.body, user_email: req.user.email };
+    const payload = { ...req.body, userId: req.user.userId, user_email: req.user.email };
     const validation = validateTicket(payload);
     if (!validation.valid) {
       return res.status(400).json({ error: validation.errors.join(', ') });
@@ -264,7 +281,9 @@ app.post('/tickets', authenticateToken, async (req, res) => {
     const newTicket = buildTicketDocument(payload);
     await newTicket.save();
 
-    res.status(201).json(newTicket);
+    const ticketObj = newTicket.toObject();
+    delete ticketObj._id;
+    res.status(201).json(ticketObj);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -283,16 +302,18 @@ app.get('/dashboard', authenticateToken, async (req, res) => {
   try {
     if (req.user.role === 'admin') {
       const [tickets, users] = await Promise.all([
-        Ticket.find({}),
-        User.find({}).select('-passwordHash'),
+        Ticket.find({}).select('-_id').lean(),
+        User.find({}).select('-_id -passwordHash').lean(),
       ]);
+      // Add role manually to users for frontend display if needed
+      const mappedUsers = users.map(u => ({ ...u, role: 'user' }));
       return res.json({
         role: 'admin',
         tickets,
-        users,
+        users: mappedUsers,
       });
     } else {
-      const tickets = await Ticket.find({ user_email: req.user.email });
+      const tickets = await Ticket.find({ userId: req.user.userId }).select('-_id').lean();
       return res.json({
         role: 'user',
         tickets,
@@ -324,18 +345,41 @@ app.get('/admin/users', authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
-app.patch('/admin/users/:id/make-admin', authenticateToken, requireAdmin, async (req, res) => {
+app.get('/admin/users/:id/tickets', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findOne({ publicId: req.params.id }).select('-passwordHash') || await Admin.findOne({ publicId: req.params.id }).select('-passwordHash');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    if (user.role === 'admin') {
-      return res.status(400).json({ error: 'User is already an admin' });
+    const result = await getTicketsWithQuery(req, { userId: user._id });
+    res.json({ user: { ...user.toObject(), role: user.publicId.startsWith('ADM') ? 'admin' : 'user' }, ...result });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.patch('/admin/users/:id/make-admin', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findOne({ publicId: req.params.id });
+    if (!user) {
+      const isAdmin = await Admin.findOne({ publicId: req.params.id });
+      if (isAdmin) {
+        return res.status(400).json({ error: 'User is already an admin' });
+      }
+      return res.status(404).json({ error: 'User not found' });
     }
-    user.role = 'admin';
-    await user.save();
-    return res.json({ message: 'User promoted to admin', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    
+    const admin = new Admin({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      isActive: user.isActive,
+    });
+    await admin.save();
+    await User.findByIdAndDelete(user._id);
+
+    return res.json({ message: 'User promoted to admin', user: { id: admin.publicId, name: admin.name, email: admin.email, role: 'admin' } });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -344,14 +388,19 @@ app.patch('/admin/users/:id/make-admin', authenticateToken, requireAdmin, async 
 // User Management Routes
 app.patch('/admin/users/:id/toggle-active', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    let user = await User.findOne({ publicId: req.params.id });
+    let isUserAdmin = false;
+    if (!user) {
+      user = await Admin.findOne({ publicId: req.params.id });
+      isUserAdmin = true;
+    }
     if (!user) return res.status(404).json({ error: 'User not found' });
-    if (user.role === 'admin' && user._id.toString() === req.user.userId) {
+    if (isUserAdmin && user._id.toString() === req.user.userId) {
       return res.status(400).json({ error: 'You cannot deactivate yourself' });
     }
     user.isActive = !user.isActive;
     await user.save();
-    res.json({ message: `User is now ${user.isActive ? 'active' : 'inactive'}`, user });
+    res.json({ message: `User is now ${user.isActive ? 'active' : 'inactive'}`, user: { ...user.toObject(), role: isUserAdmin ? 'admin' : 'user' } });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -363,7 +412,7 @@ app.patch('/admin/users/:id/reset-password', authenticateToken, requireAdmin, as
     if (!newPassword || newPassword.length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
-    const user = await User.findById(req.params.id);
+    let user = await User.findOne({ publicId: req.params.id }) || await Admin.findOne({ publicId: req.params.id });
     if (!user) return res.status(404).json({ error: 'User not found' });
     const passwordHash = await bcrypt.hash(newPassword, 10);
     user.passwordHash = passwordHash;
@@ -376,13 +425,16 @@ app.patch('/admin/users/:id/reset-password', authenticateToken, requireAdmin, as
 
 app.delete('/admin/users/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    if (user.role === 'admin') {
-      return res.status(400).json({ error: 'Admins cannot be deleted directly' });
+    let user = await User.findOne({ publicId: req.params.id });
+    if (!user) {
+      const admin = await Admin.findOne({ publicId: req.params.id });
+      if (admin) {
+        return res.status(400).json({ error: 'Admins cannot be deleted directly' });
+      }
+      return res.status(404).json({ error: 'User not found' });
     }
-    await Ticket.deleteMany({ user_email: user.email });
-    await User.findByIdAndDelete(req.params.id);
+    await Ticket.deleteMany({ userId: user._id });
+    await User.findByIdAndDelete(user._id);
     res.json({ message: 'User and all associated tickets deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -393,7 +445,8 @@ app.delete('/admin/users/:id', authenticateToken, requireAdmin, async (req, res)
 app.patch('/users/profile', authenticateToken, async (req, res) => {
   try {
     const { name, password } = req.body;
-    const user = await User.findById(req.user.userId);
+    const Model = req.user.collection === 'Admin' ? Admin : User;
+    const user = await Model.findById(req.user.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     if (name) {
@@ -410,10 +463,10 @@ app.patch('/users/profile', authenticateToken, async (req, res) => {
     res.json({
       message: 'Profile updated successfully',
       user: {
-        id: user._id,
+        id: user.publicId,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: req.user.role,
       }
     });
   } catch (error) {
@@ -428,10 +481,10 @@ app.patch('/tickets/:id/status', authenticateToken, async (req, res) => {
     if (!['open', 'in progress', 'closed'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
-    const ticket = await Ticket.findById(req.params.id);
+    const ticket = await Ticket.findOne({ publicId: req.params.id });
     if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
 
-    if (req.user.role !== 'admin' && ticket.user_email !== req.user.email) {
+    if (req.user.role !== 'admin' && ticket.userId.toString() !== req.user.userId) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
@@ -443,7 +496,9 @@ app.patch('/tickets/:id/status', authenticateToken, async (req, res) => {
     }
     await ticket.save();
 
-    res.json(ticket);
+    const ticketObj = ticket.toObject();
+    delete ticketObj._id;
+    res.json(ticketObj);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -452,12 +507,12 @@ app.patch('/tickets/:id/status', authenticateToken, async (req, res) => {
 app.patch('/tickets/:id/assign', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { assignedToEmail } = req.body;
-    const ticket = await Ticket.findById(req.params.id);
+    const ticket = await Ticket.findOne({ publicId: req.params.id });
     if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
 
     let assignedToUser = null;
     if (assignedToEmail) {
-      assignedToUser = await User.findOne({ email: assignedToEmail });
+      assignedToUser = await Admin.findOne({ email: assignedToEmail });
       if (!assignedToUser) {
         return res.status(400).json({ error: 'Agent not found' });
       }
@@ -467,7 +522,9 @@ app.patch('/tickets/:id/assign', authenticateToken, requireAdmin, async (req, re
     ticket.assignedToEmail = assignedToUser ? assignedToUser.email : null;
     await ticket.save();
 
-    res.json(ticket);
+    const ticketObj = ticket.toObject();
+    delete ticketObj._id;
+    res.json(ticketObj);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -479,10 +536,10 @@ app.post('/tickets/:id/comments', authenticateToken, async (req, res) => {
     if (!body || body.trim() === '') {
       return res.status(400).json({ error: 'Comment body is required' });
     }
-    const ticket = await Ticket.findById(req.params.id);
+    const ticket = await Ticket.findOne({ publicId: req.params.id });
     if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
 
-    if (req.user.role !== 'admin' && ticket.user_email !== req.user.email) {
+    if (req.user.role !== 'admin' && ticket.userId.toString() !== req.user.userId) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 

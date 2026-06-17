@@ -77,39 +77,68 @@ function TicketListContent() {
                 <p className="text-center text-red-500 py-4 font-semibold">{error}</p>
             ) : (
                 <>
-                    <div className="space-y-4">
-                        {tickets.map((ticket) => (
-                            <div key={ticket._id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all relative">
-                                <Link href={`/tickets/${ticket._id}`} className="block">
-                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
-                                        <h3 className="text-base font-bold text-slate-800 dark:text-white leading-tight min-w-0 flex-1">
-                                            {ticket.title}
-                                        </h3>
-                                        <div className="flex gap-2 items-center flex-shrink-0">
-                                            <span className={`pill ${ticket.priority}`}>
-                                                {ticket.priority}
-                                            </span>
-                                            <span className={`badge-status-${ticket.status.replace(' ', '-')}`}>
-                                                {ticket.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <p className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 my-2 leading-relaxed">
-                                        {ticket.body}
-                                    </p>
-                                    <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-3">
-                                        <span>Created on {formatDateISO(ticket.createdAt)}</span>
-                                    </div>
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
-
-                    {tickets.length === 0 && (
-                        <div className="empty-state">
-                            <p className="empty-state-text">No tickets found matching the search criteria.</p>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">ID</th>
+                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider w-1/2">Subject</th>
+                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Priority</th>
+                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Agent</th>
+                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                                    {tickets.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" className="py-12 text-center">
+                                                <p className="text-sm text-slate-500 font-semibold mb-3">No tickets found matching the search criteria.</p>
+                                                <Link href="/tickets/create" className="inline-block bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold py-2 px-4 rounded-lg text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                                                    Create a Ticket
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        tickets.map((ticket) => (
+                                            <tr key={ticket.publicId} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                                <td className="py-3.5 px-5 text-xs font-bold text-slate-500 whitespace-nowrap">
+                                                    <Link href={`/tickets/${ticket.publicId}`} className="hover:text-primary transition-colors">
+                                                        #{ticket.publicId}
+                                                    </Link>
+                                                </td>
+                                                <td className="py-3.5 px-5">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ticket.priority === 'high' ? 'bg-red-500' : ticket.priority === 'medium' ? 'bg-blue-500' : 'bg-emerald-500'}`}></span>
+                                                        <Link href={`/tickets/${ticket.publicId}`} className="text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-colors line-clamp-1">
+                                                            {ticket.title}
+                                                        </Link>
+                                                    </div>
+                                                </td>
+                                                <td className="py-3.5 px-5 whitespace-nowrap">
+                                                    <span className={`pill ${ticket.priority}`}>
+                                                        {ticket.priority}
+                                                    </span>
+                                                </td>
+                                                <td className="py-3.5 px-5 whitespace-nowrap">
+                                                    <span className={`badge-status-${ticket.status.replace(' ', '-')}`}>
+                                                        {ticket.status}
+                                                    </span>
+                                                </td>
+                                                <td className="py-3.5 px-5 text-xs font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                                    {ticket.assignedToEmail || <span className="text-slate-400 italic font-normal">Unassigned</span>}
+                                                </td>
+                                                <td className="py-3.5 px-5 text-xs text-slate-500 text-right whitespace-nowrap">
+                                                    {formatDateISO(ticket.createdAt)}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
+                    </div>
 
                     {/* Pagination Controls */}
                     {pagination.pages > 1 && (

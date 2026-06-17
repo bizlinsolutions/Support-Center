@@ -62,7 +62,7 @@ export default function AdminUsers() {
       showToast(`${name} is now an admin!`, 'success');
       // Update local state
       setUsers(prev =>
-        prev.map(u => u._id === id ? { ...u, role: 'admin' } : u)
+        prev.map(u => u.publicId === id ? { ...u, role: 'admin' } : u)
       );
     } catch (err) {
       showToast(err.message || 'Failed to promote user', 'error');
@@ -123,7 +123,7 @@ export default function AdminUsers() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-850 dark:text-white">User Management</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-800 dark:text-white font-sans">User Management</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
             Manage system roles, view user profile tickets, and monitor user stats.
           </p>
@@ -170,7 +170,7 @@ export default function AdminUsers() {
             placeholder="Filter users by name or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-850 rounded-lg text-slate-850 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+            className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
           />
         </div>
       </div>
@@ -178,7 +178,7 @@ export default function AdminUsers() {
       {/* Table/Card Grid Display */}
       {filteredUsers.length === 0 ? (
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-12 rounded-xl text-center shadow-sm">
-          <svg className="w-16 h-16 text-slate-200 dark:text-slate-850 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-16 h-16 text-slate-200 dark:text-slate-800 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
           <p className="text-slate-500 dark:text-slate-400 font-semibold text-sm">No users found matching query.</p>
@@ -199,14 +199,14 @@ export default function AdminUsers() {
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
                 {filteredUsers.map((u) => (
-                  <tr key={u._id} className="hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
+                  <tr key={u.publicId} className="hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
                     <td className="py-3.5 px-5 flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${getColorClass(u.email)}`}>
                         {getInitials(u.name)}
                       </div>
-                      <span className="text-sm font-semibold text-slate-850 dark:text-slate-200">{u.name}</span>
+                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{u.name}</span>
                     </td>
-                    <td className="py-3.5 px-5 text-sm text-slate-500 dark:text-slate-405">{u.email}</td>
+                    <td className="py-3.5 px-5 text-sm text-slate-500 dark:text-slate-400">{u.email}</td>
                     <td className="py-3.5 px-5">
                       <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${u.role === 'admin'
                           ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
@@ -219,18 +219,18 @@ export default function AdminUsers() {
                     <td className="py-3.5 px-5 text-right">
                       <div className="inline-flex items-center gap-2 justify-end">
                         <Link
-                          href={`/admin/users/${u._id}/tickets`}
-                          className="bg-slate-50 border border-slate-200 hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-205 text-xs font-bold py-1.5 px-3 rounded-lg transition-all min-h-[44px] flex items-center"
+                          href={`/admin/users/${u.publicId}/tickets`}
+                          className="bg-slate-50 border border-slate-200 hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200 text-xs font-bold py-1.5 px-3 rounded-lg transition-all min-h-[44px] flex items-center"
                         >
                           View Tickets
                         </Link>
                         {u.role !== 'admin' && (
                           <button
-                            onClick={() => handleMakeAdmin(u._id, u.name)}
-                            disabled={actionLoadingId === u._id}
-                            className="bg-purple-600 hover:bg-purple-705 text-white text-xs font-extrabold py-1.5 px-3 rounded-lg disabled:opacity-50 transition-all min-h-[44px]"
+                            onClick={() => handleMakeAdmin(u.publicId, u.name)}
+                            disabled={actionLoadingId === u.publicId}
+                            className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-extrabold py-1.5 px-3 rounded-lg disabled:opacity-50 transition-all min-h-[44px]"
                           >
-                            {actionLoadingId === u._id ? 'Processing...' : 'Make Admin'}
+                            {actionLoadingId === u.publicId ? 'Processing...' : 'Make Admin'}
                           </button>
                         )}
                       </div>
@@ -244,14 +244,14 @@ export default function AdminUsers() {
           {/* Mobile Card Layout */}
           <div className="md:hidden grid grid-cols-1 gap-4">
             {filteredUsers.map((u) => (
-              <div key={u._id} className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-sm space-y-4">
+              <div key={u.publicId} className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${getColorClass(u.email)}`}>
                     {getInitials(u.name)}
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-850 dark:text-white">{u.name}</h4>
-                    <p className="text-xs text-slate-550 dark:text-slate-400 mt-0.5">{u.email}</p>
+                    <h4 className="text-sm font-bold text-slate-800 dark:text-white">{u.name}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{u.email}</p>
                   </div>
                 </div>
 
@@ -273,8 +273,8 @@ export default function AdminUsers() {
 
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center gap-2">
                   <Link
-                    href={`/admin/users/${u._id}/tickets`}
-                    className="flex-1 text-center bg-slate-50 border border-slate-200 hover:bg-slate-105 dark:bg-slate-950 dark:border-slate-800 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-205 text-xs font-bold py-2 rounded-lg transition-all min-h-[44px] flex justify-center items-center"
+                    href={`/admin/users/${u.publicId}/tickets`}
+                    className="flex-1 text-center bg-slate-50 border border-slate-200 hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200 text-xs font-bold py-2 rounded-lg transition-all min-h-[44px] flex justify-center items-center"
                   >
                     View Tickets
                   </Link>
@@ -282,7 +282,7 @@ export default function AdminUsers() {
                     <button
                       onClick={() => handleMakeAdmin(u._id, u.name)}
                       disabled={actionLoadingId === u._id}
-                      className="flex-1 bg-purple-600 hover:bg-purple-705 text-white text-xs font-extrabold py-2 rounded-lg disabled:opacity-50 transition-all min-h-[44px] justify-center"
+                      className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-extrabold py-2 rounded-lg disabled:opacity-50 transition-all min-h-[44px] justify-center"
                     >
                       {actionLoadingId === u._id ? 'Processing...' : 'Make Admin'}
                     </button>

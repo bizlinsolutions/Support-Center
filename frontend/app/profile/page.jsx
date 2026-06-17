@@ -78,8 +78,8 @@ export default function Profile() {
         </Link>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 md:p-8">
-        <h2 className="text-2xl font-extrabold text-slate-850 dark:text-white mb-1 tracking-tight">My Profile</h2>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 md:p-8">
+        <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white mb-1 tracking-tight">My Profile</h2>
         <p className="text-xs text-slate-500 mb-6 font-semibold">Manage your display settings, roles, and security details</p>
 
         <form onSubmit={handleUpdateProfile} className="space-y-5 bg-transparent border-0 shadow-none p-0 max-w-full">
@@ -91,7 +91,7 @@ export default function Profile() {
               type="email"
               disabled
               value={email}
-              className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-950/40 text-slate-500 cursor-not-allowed border-slate-200 dark:border-slate-850 rounded-lg text-sm font-semibold min-h-[44px]"
+              className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-950/40 text-slate-500 cursor-not-allowed border-slate-200 dark:border-slate-800 rounded-lg text-sm font-semibold min-h-[44px]"
             />
           </div>
 
@@ -101,7 +101,7 @@ export default function Profile() {
             </label>
             <span className={`inline-block text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${role === 'admin'
               ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
-              : 'bg-slate-100 text-slate-650 dark:bg-slate-800 dark:text-slate-300'
+              : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
             }`}>
               {role}
             </span>
@@ -123,8 +123,8 @@ export default function Profile() {
 
           <div className="border-t border-slate-100 dark:border-slate-800 my-6 pt-6 space-y-4">
             <div>
-              <h3 className="text-sm font-bold text-slate-850 dark:text-white">Change Password</h3>
-              <p className="text-[10px] text-slate-455 dark:text-slate-500 font-bold uppercase mt-0.5">Leave blank if you do not want to update password</p>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-white">Change Password</h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase mt-0.5">Leave blank if you do not want to update password</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -137,7 +137,7 @@ export default function Profile() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-855 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
                 />
               </div>
 
@@ -150,7 +150,7 @@ export default function Profile() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter new password"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-855 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
                 />
               </div>
             </div>

@@ -43,11 +43,7 @@ export default function LayoutWrapper({ children }) {
   return (
     <div
       className={`flex-1 min-h-screen pt-16 flex flex-col transition-all duration-300 ${
-        showSidebar
-          ? isCollapsed
-            ? 'md:pl-[60px]'
-            : 'md:pl-60'
-          : 'pl-0'
+        showSidebar ? 'md:pl-[220px]' : 'pl-0'
       }`}
     >
       {children}

@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 export default function Sidebar() {
   const pathname = usePathname();
   const [user, setUser] = useState(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const isAuthPage = pathname === '/login' || pathname === '/signup';
@@ -28,9 +27,6 @@ export default function Sidebar() {
     };
 
     setUser(getCookie());
-
-    const savedCollapse = localStorage.getItem('sidebar-collapsed');
-    setIsCollapsed(savedCollapse === 'true');
   }, [pathname]);
 
   useEffect(() => {
@@ -50,20 +46,13 @@ export default function Sidebar() {
 
   if (isAuthPage || !user) return null;
 
-  const toggleCollapse = () => {
-    const nextState = !isCollapsed;
-    setIsCollapsed(nextState);
-    localStorage.setItem('sidebar-collapsed', String(nextState));
-    window.dispatchEvent(new CustomEvent('sidebar-collapsed-change', { detail: nextState }));
-  };
-
   const navItems = [
     {
       label: 'Dashboard',
       href: '/',
       icon: (
-        <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
+        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
         </svg>
       )
     },
@@ -71,17 +60,17 @@ export default function Sidebar() {
       label: 'My Tickets',
       href: '/tickets',
       icon: (
-        <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
         </svg>
       )
     },
     {
-      label: 'Create Ticket',
+      label: 'New Ticket',
       href: '/tickets/create',
       icon: (
-        <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       )
     },
@@ -89,8 +78,8 @@ export default function Sidebar() {
       label: 'Profile',
       href: '/profile',
       icon: (
-        <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
       )
     }
@@ -98,11 +87,11 @@ export default function Sidebar() {
 
   const adminItems = [
     {
-      label: 'Users',
+      label: 'Manage Users',
       href: '/admin/users',
       icon: (
-        <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
       )
     },
@@ -110,8 +99,8 @@ export default function Sidebar() {
       label: 'Analytics',
       href: '/admin/analytics',
       icon: (
-        <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       )
     }
@@ -119,48 +108,18 @@ export default function Sidebar() {
 
   const allItems = [...navItems, ...adminItems];
 
-  const renderNavLinks = (items) => {
-    return items.map((item) => {
-      const isActive =
-        pathname === item.href ||
-        (item.href !== '/' &&
-          pathname.startsWith(item.href) &&
-          // Only active if no other nav item is a longer (more specific) match
-          !allItems.some(
-            (other) =>
-              other.href !== item.href &&
-              other.href.length > item.href.length &&
-              pathname.startsWith(other.href)
-          ));
-      return (
-        <Link
-          key={item.label}
-          href={item.href}
-          className={`flex items-center rounded-lg text-sm font-semibold transition-all group relative cursor-pointer min-h-[44px] ${
-            isCollapsed
-              ? 'justify-center p-2'
-              : 'gap-3 px-3 py-2.5'
-          } ${
-            isActive
-              ? 'bg-primary/10 text-primary dark:bg-primary/20'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          {item.icon}
-          {!isCollapsed && (
-            <span className="transition-opacity duration-200">{item.label}</span>
-          )}
-          {isActive && !isCollapsed && (
-            <span className="absolute right-3 w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          )}
-          {isCollapsed && (
-            <div className="absolute left-16 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 z-50 whitespace-nowrap">
-              {item.label}
-            </div>
-          )}
-        </Link>
-      );
-    });
+  const isActiveLink = (item) => {
+    return (
+      pathname === item.href ||
+      (item.href !== '/' &&
+        pathname.startsWith(item.href) &&
+        !allItems.some(
+          (other) =>
+            other.href !== item.href &&
+            other.href.length > item.href.length &&
+            pathname.startsWith(other.href)
+        ))
+    );
   };
 
   const getInitials = (name) => {
@@ -180,65 +139,110 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-16 bottom-0 left-0 z-40 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-all duration-300 overflow-x-hidden
+        className={`fixed top-0 bottom-0 left-0 z-50 bg-slate-950 border-r border-slate-800/70 flex flex-col transition-transform duration-300
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-          ${isCollapsed ? 'w-[60px]' : 'w-60'}
+          w-[220px]
         `}
       >
-        <div className={`flex-1 py-4 ${isCollapsed ? 'px-2' : 'px-3'} space-y-6 overflow-y-auto overflow-x-hidden`}>
-          {/* Main Links */}
-          <div className="space-y-1">
-            {!isCollapsed && (
-              <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                Main Menu
-              </span>
-            )}
-            {renderNavLinks(navItems)}
+        {/* Brand Header */}
+        <div className="h-16 flex items-center gap-2.5 px-5 border-b border-slate-800/70 flex-shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-extrabold text-sm shadow-md flex-shrink-0">
+            D
+          </div>
+          <span className="text-[15px] font-bold text-white tracking-tight">
+            DeskFlow
+          </span>
+        </div>
+
+        {/* Nav Links */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3">
+          {/* Section Label */}
+          <div className="px-2 mb-2">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              Main
+            </span>
           </div>
 
-          {/* Admin Links */}
+          {/* Main Nav Items */}
+          <nav className="space-y-0.5 mb-6">
+            {navItems.map((item) => {
+              const active = isActiveLink(item);
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 group
+                    ${active
+                      ? 'bg-primary/15 text-primary border-l-0'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`}
+                >
+                  <span className={`${active ? 'text-primary' : 'text-slate-500 group-hover:text-slate-300'} transition-colors`}>
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
+                  {active && (
+                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Admin Section */}
           {user?.role === 'admin' && (
-            <div className="space-y-1 pt-4 border-t border-slate-100 dark:border-slate-800/60">
-              {!isCollapsed && (
-                <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                  Administration
+            <>
+              <div className="px-2 mb-2 pt-2 border-t border-slate-800/60">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                  Admin
                 </span>
-              )}
-              {renderNavLinks(adminItems)}
-            </div>
+              </div>
+              <nav className="space-y-0.5">
+                {adminItems.map((item) => {
+                  const active = isActiveLink(item);
+                  return (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 group
+                        ${active
+                          ? 'bg-primary/15 text-primary'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                        }`}
+                    >
+                      <span className={`${active ? 'text-primary' : 'text-slate-500 group-hover:text-slate-300'} transition-colors`}>
+                        {item.icon}
+                      </span>
+                      <span>{item.label}</span>
+                      {active && (
+                        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </>
           )}
         </div>
 
-        {/* Sidebar Footer */}
-        <div className={`p-3 border-t border-slate-200 dark:border-slate-800 flex flex-col ${isCollapsed ? 'items-center gap-4' : 'gap-3'}`}>
-          {/* User Info */}
-          <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center px-0' : 'px-2 py-1.5 bg-slate-50 dark:bg-slate-800/40 rounded-xl'}`}>
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs flex-shrink-0">
+        {/* Sidebar Footer — User Info */}
+        <div className="p-3 border-t border-slate-800/70 flex-shrink-0">
+          <Link
+            href="/profile"
+            className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-slate-800/60 transition-all group"
+          >
+            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-sm">
               {getInitials(user?.name)}
             </div>
-            {!isCollapsed && (
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold truncate text-slate-800 dark:text-slate-200">{user?.name}</p>
-                <p className="text-[10px] text-slate-400 truncate capitalize">{user?.role}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Collapse Toggle Button */}
-          <button
-            onClick={toggleCollapse}
-            className="hidden md:flex items-center justify-center w-full py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all cursor-pointer min-h-[44px]"
-            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          >
-            <svg
-              className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-          </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-slate-200 truncate group-hover:text-white transition-colors">
+                {user?.name || 'User'}
+              </p>
+              <p className="text-[10px] text-slate-500 truncate">
+                {user?.role === 'admin' ? 'Administrator' : 'Member'}
+              </p>
+            </div>
+          </Link>
         </div>
       </aside>
     </>

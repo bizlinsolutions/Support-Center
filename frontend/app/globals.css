@@ -1,40 +1,42 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #6366f1;
-  --color-primary-hover: #4f46e5;
+  --color-primary: #0052cc;
+  --color-primary-hover: #0747a6;
 }
 
 :root {
-  --background: #f1f5f9;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
+  --background: #f4f6f9; /* Zoho Desk clear light gray */
+  --text-main: #1e293b; /* slate-800 */
+  --text-muted: #475569; /* slate-600 */
   --card-bg: #ffffff;
   --border-color: #e2e8f0;
   --input-bg: #ffffff;
   --input-text: #0f172a;
   --nav-bg: #ffffff;
-  --shadow-color: rgba(148, 163, 184, 0.1);
-  --success-bg: #ecfdf5;
-  --success-text: #047857;
+  --sidebar-bg: #0f172a;
+  --shadow-color: rgba(15, 23, 42, 0.04);
+  --success-bg: #f0fdf4;
+  --success-text: #15803d;
   --danger-bg: #fef2f2;
   --danger-text: #b91c1c;
 }
 
 .dark {
-  --background: #0f172a;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --card-bg: #1e293b;
-  --border-color: #334155;
-  --input-bg: #0f172a;
+  --background: #090d16; /* Clean deep slate-black background */
+  --text-main: #f8fafc; /* slate-50 */
+  --text-muted: #94a3b8; /* slate-400 */
+  --card-bg: #131a26; /* Sleek, high-contrast dark card gray */
+  --border-color: #222d3f; /* Crisp, visible dark borders */
+  --input-bg: #131a26;
   --input-text: #f8fafc;
-  --nav-bg: #1e293b;
+  --nav-bg: #131a26;
+  --sidebar-bg: #090d16;
   --shadow-color: rgba(0, 0, 0, 0.3);
-  --success-bg: #064e3b;
+  --success-bg: rgba(16, 185, 129, 0.1);
   --success-text: #34d399;
-  --danger-bg: #7f1d1d;
-  --danger-text: #fca5a5;
+  --danger-bg: rgba(239, 68, 68, 0.1);
+  --danger-text: #f87171;
 }
 
 @layer base {
@@ -108,13 +110,13 @@ nav {
 .card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
-  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 var(--shadow-color), 0 1px 2px -1px var(--shadow-color);
+  border-radius: 8px;
   padding: 1.5rem;
   margin: 1.25rem 0;
   position: relative;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+  transition: box-shadow 0.2s, background-color 0.3s;
 }
 
 .card:hover {
@@ -182,19 +184,19 @@ form label {
 
 /* Pill styles */
 .pill {
-  @apply py-1 px-3 inline-block text-[11px] font-bold rounded-full uppercase tracking-wider;
+  @apply py-0.5 px-2 inline-block text-[10px] font-bold rounded-md uppercase tracking-wider border;
 }
 
 .pill.high {
-  @apply bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300;
+  @apply bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20;
 }
 
 .pill.medium {
-  @apply bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300;
+  @apply bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-500/10 dark:text-sky-400 dark:border-sky-500/20;
 }
 
 .pill.low {
-  @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300;
+  @apply bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20;
 }
 
 .card .pill {
@@ -204,19 +206,23 @@ form label {
 /* ─── Dashboard Semantic Classes ─────────────────────────── */
 
 .dashboard-welcome-card {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.05) 50%, rgba(16, 185, 129, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(0, 82, 204, 0.02) 0%, rgba(0, 82, 204, 0.06) 100%);
   border: 1px solid var(--border-color);
-  @apply p-8 rounded-2xl mb-8 transition-all duration-300;
+  @apply p-8 rounded-xl mb-8 transition-all duration-300;
+}
+
+.dark .dashboard-welcome-card {
+  background: linear-gradient(135deg, rgba(0, 82, 204, 0.06) 0%, rgba(0, 82, 204, 0.12) 100%);
 }
 
 .dashboard-welcome-card-plain {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  @apply p-8 rounded-2xl mb-8 transition-all duration-300;
+  @apply p-8 rounded-xl mb-8 transition-all duration-300;
 }
 
 .dashboard-title {
-  @apply text-3xl font-extrabold tracking-tight;
+  @apply text-2xl font-extrabold tracking-tight;
 }
 
 .dashboard-subtitle {
@@ -225,42 +231,42 @@ form label {
 }
 
 .badge-admin {
-  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-purple-100 text-purple-700 tracking-wide dark:bg-purple-900/40 dark:text-purple-300;
+  @apply text-[10px] px-2 py-0.5 rounded font-bold uppercase bg-purple-100 text-purple-700 tracking-wide dark:bg-purple-900/40 dark:text-purple-300;
 }
 
 /* Stats Row */
 .stats-grid {
-  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8;
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8;
 }
 
 .stat-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+  @apply p-5 rounded-lg shadow-sm hover:shadow transition-all;
 }
 
 .stat-card-purple {
-  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(168, 85, 247, 0.03) 100%);
+  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(168, 85, 247, 0.02) 100%);
   border: 1px solid var(--border-color);
-  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+  @apply p-5 rounded-lg shadow-sm hover:shadow transition-all;
 }
 
 .stat-card-red {
-  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.03) 100%);
+  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(239, 68, 68, 0.02) 100%);
   border: 1px solid var(--border-color);
-  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+  @apply p-5 rounded-lg shadow-sm hover:shadow transition-all;
 }
 
 .stat-card-blue {
-  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.03) 100%);
+  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(59, 130, 246, 0.02) 100%);
   border: 1px solid var(--border-color);
-  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+  @apply p-5 rounded-lg shadow-sm hover:shadow transition-all;
 }
 
 .stat-card-emerald {
-  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.03) 100%);
+  background: linear-gradient(185deg, var(--card-bg) 0%, rgba(16, 185, 129, 0.02) 100%);
   border: 1px solid var(--border-color);
-  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all;
+  @apply p-5 rounded-lg shadow-sm hover:shadow transition-all;
 }
 
 .stat-card-label {
@@ -312,7 +318,7 @@ form label {
 .table-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  @apply rounded-2xl shadow-sm overflow-hidden;
+  @apply rounded-xl shadow-sm overflow-hidden;
 }
 
 .table-header-row {
@@ -389,7 +395,7 @@ form label {
 .ticket-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  @apply p-4 rounded-xl shadow-sm hover:shadow-md transition-all;
+  @apply p-4 rounded-xl shadow-sm hover:shadow transition-all;
 }
 
 .ticket-card-title {
@@ -402,35 +408,35 @@ form label {
 }
 
 .badge-high {
-  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300;
+  @apply text-[10px] px-2.5 py-1 rounded-md font-bold uppercase bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20;
 }
 
 .badge-medium {
-  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300;
+  @apply text-[10px] px-2.5 py-1 rounded-md font-bold uppercase bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-500/10 dark:text-sky-400 dark:border-sky-500/20;
 }
 
 .badge-low {
-  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300;
+  @apply text-[10px] px-2.5 py-1 rounded-md font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20;
 }
 
 .badge-status-open {
-  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300;
+  @apply text-[10px] px-2.5 py-1 rounded-md font-bold uppercase bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20;
 }
 
 .badge-status-in-progress {
-  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300;
+  @apply text-[10px] px-2.5 py-1 rounded-md font-bold uppercase bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-500/10 dark:text-sky-400 dark:border-sky-500/20;
 }
 
 .badge-status-resolved {
-  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300;
+  @apply text-[10px] px-2.5 py-1 rounded-md font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20;
 }
 
 .badge-status-closed {
-  @apply text-[10px] px-2.5 py-1 rounded-full font-bold uppercase bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300;
+  @apply text-[10px] px-2.5 py-1 rounded-md font-bold uppercase bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700;
 }
 
 .empty-state {
-  @apply bg-slate-50/50 border border-dashed border-slate-300 p-8 rounded-2xl text-center dark:bg-slate-900/20 dark:border-slate-800;
+  @apply bg-slate-50 border border-dashed border-slate-300 p-8 rounded-xl text-center dark:bg-slate-900/40 dark:border-slate-800;
 }
 
 .empty-state-text {
@@ -441,7 +447,7 @@ form label {
 .quick-actions-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  @apply mt-8 p-6 rounded-2xl shadow-sm;
+  @apply mt-8 p-6 rounded-xl shadow-sm;
 }
 
 .quick-actions-title {
@@ -464,7 +470,7 @@ form label {
 .recent-ticket-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  @apply p-5 rounded-2xl shadow-sm hover:shadow-md transition-all relative;
+  @apply p-5 rounded-lg shadow-sm hover:shadow transition-all relative;
 }
 
 .recent-ticket-title {
@@ -484,7 +490,7 @@ form label {
 .quick-actions-panel {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  @apply p-6 rounded-2xl shadow-sm space-y-4;
+  @apply p-6 rounded-xl shadow-sm space-y-4;
 }
 
 .btn-full-outline {

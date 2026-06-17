@@ -42,7 +42,7 @@ export default function CreateForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl shadow-md space-y-5 my-6">
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-xl shadow-md space-y-5 my-6">
       <div className="space-y-1">
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           Title
@@ -53,7 +53,7 @@ export default function CreateForm() {
           onChange={(e) => setTitle(e.target.value)}
           value={title}
           placeholder="Enter a descriptive title..."
-          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-855 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
           disabled={isLoading || success}
         />
       </div>
@@ -68,7 +68,7 @@ export default function CreateForm() {
           onChange={(e) => setBody(e.target.value)}
           value={body}
           placeholder="Describe your issue in detail..."
-          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-855 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
           disabled={isLoading || success}
         />
         <span className="block text-[10px] text-slate-400 dark:text-slate-500 mt-1 text-right font-bold">
@@ -83,7 +83,7 @@ export default function CreateForm() {
         <select
           onChange={(e) => setPriority(e.target.value)}
           value={priority}
-          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-855 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px] cursor-pointer font-semibold"
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px] cursor-pointer font-semibold"
           disabled={isLoading || success}
         >
           <option value="low">Low Priority</option>
