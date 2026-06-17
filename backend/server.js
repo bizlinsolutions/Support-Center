@@ -225,7 +225,7 @@ app.post('/auth/refresh', async (req, res) => {
     const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
     const Model = payload.collection === 'Admin' ? Admin : User;
     const user = await Model.findById(payload.userId);
-    
+
     if (!user) {
       return res.status(403).json({ error: 'Invalid refresh token' });
     }
@@ -368,7 +368,7 @@ app.patch('/admin/users/:id/make-admin', authenticateToken, requireAdmin, async 
       }
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     const admin = new Admin({
       _id: user._id,
       name: user.name,
