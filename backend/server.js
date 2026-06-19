@@ -273,7 +273,7 @@ app.get('/tickets/:id', authenticateToken, authorizeTicketOwner, async (req, res
 
 app.post('/tickets', authenticateToken, async (req, res) => {
   try {
-    const payload = { ...req.body, userId: req.user.userId, user_email: req.user.email };
+    const payload = { ...req.body, userId: req.user.userId, user_email: req.user.email, userCollection: req.user.collection };
     const validation = validateTicket(payload);
     if (!validation.valid) {
       return res.status(400).json({ error: validation.errors.join(', ') });
@@ -301,16 +301,17 @@ app.delete('/tickets/:id', authenticateToken, authorizeTicketOwner, async (req, 
 app.get('/dashboard', authenticateToken, async (req, res) => {
   try {
     if (req.user.role === 'admin') {
-      const [tickets, users] = await Promise.all([
+      const [tickets, users, admins] = await Promise.all([
         Ticket.find({}).select('-_id').lean(),
         User.find({}).select('-_id -passwordHash').lean(),
+        Admin.find({}).select('-_id -passwordHash').lean(),
       ]);
-      // Add role manually to users for frontend display if needed
       const mappedUsers = users.map(u => ({ ...u, role: 'user' }));
+      const mappedAdmins = admins.map(a => ({ ...a, role: 'admin' }));
       return res.json({
         role: 'admin',
         tickets,
-        users: mappedUsers,
+        users: [...mappedAdmins, ...mappedUsers],
       });
     } else {
       const tickets = await Ticket.find({ userId: req.user.userId }).select('-_id').lean();
@@ -338,8 +339,15 @@ app.get('/admin/tickets', authenticateToken, requireAdmin, async (req, res) => {
 
 app.get('/admin/users', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const users = await User.find({}).select('-passwordHash');
-    res.json(users);
+    const [users, admins] = await Promise.all([
+      User.find({}).select('-passwordHash'),
+      Admin.find({}).select('-passwordHash'),
+    ]);
+
+    const mappedUsers = users.map(u => ({ ...u.toObject(), role: 'user' }));
+    const mappedAdmins = admins.map(a => ({ ...a.toObject(), role: 'admin' }));
+
+    res.json([...mappedAdmins, ...mappedUsers]);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -378,6 +386,9 @@ app.patch('/admin/users/:id/make-admin', authenticateToken, requireAdmin, async 
     });
     await admin.save();
     await User.findByIdAndDelete(user._id);
+
+    // Update userCollection on all tickets created by this user
+    await Ticket.updateMany({ userId: user._id }, { $set: { userCollection: 'Admin' } });
 
     return res.json({ message: 'User promoted to admin', user: { id: admin.publicId, name: admin.name, email: admin.email, role: 'admin' } });
   } catch (error) {

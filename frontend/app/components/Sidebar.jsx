@@ -51,8 +51,8 @@ export default function Sidebar() {
       label: 'Dashboard',
       href: '/',
       icon: (
-        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
         </svg>
       )
     },
@@ -60,8 +60,8 @@ export default function Sidebar() {
       label: 'My Tickets',
       href: '/tickets',
       icon: (
-        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={1.5} d="M9 5H7v14h10V7h-2M9 5v2h2V5M9 5h2m-3 7h3m-3 4h3" />
         </svg>
       )
     },
@@ -69,8 +69,8 @@ export default function Sidebar() {
       label: 'New Ticket',
       href: '/tickets/create',
       icon: (
-        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={1.5} d="M12 4v16m8-8H4" />
         </svg>
       )
     },
@@ -78,8 +78,8 @@ export default function Sidebar() {
       label: 'Profile',
       href: '/profile',
       icon: (
-        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
       )
     }
@@ -90,8 +90,8 @@ export default function Sidebar() {
       label: 'Manage Users',
       href: '/admin/users',
       icon: (
-        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
       )
     },
@@ -99,8 +99,8 @@ export default function Sidebar() {
       label: 'Analytics',
       href: '/admin/analytics',
       icon: (
-        <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={1.5} d="M9 19v-6h-4v6h4zm6 0V9h-4v10h4zm6 0V5h-4v14h4z" />
         </svg>
       )
     }
@@ -133,36 +133,29 @@ export default function Sidebar() {
       {isMobileOpen && (
         <div
           onClick={() => setIsMobileOpen(false)}
-          className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 bg-slate-950 border-r border-slate-800/70 flex flex-col transition-transform duration-300
+        className={`fixed top-0 bottom-0 left-0 z-50 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           w-[220px]
         `}
       >
         {/* Brand Header */}
-        <div className="h-16 flex items-center gap-2.5 px-5 border-b border-slate-800/70 flex-shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-extrabold text-sm shadow-md flex-shrink-0">
+        <div className="h-16 flex items-center gap-2.5 px-4 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+          <div className="w-6 h-6 bg-primary flex items-center justify-center text-white font-bold text-[11px] rounded flex-shrink-0">
             D
           </div>
-          <span className="text-[15px] font-bold text-white tracking-tight">
+          <span className="text-[13px] font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">
             DeskFlow
           </span>
         </div>
 
         {/* Nav Links */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3">
-          {/* Section Label */}
-          <div className="px-2 mb-2">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-              Main
-            </span>
-          </div>
-
+        <div className="flex-1 overflow-y-auto overflow-x-hidden py-4">
           {/* Main Nav Items */}
           <nav className="space-y-0.5 mb-6">
             {navItems.map((item) => {
@@ -171,19 +164,16 @@ export default function Sidebar() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 group
+                  className={`flex items-center gap-3 px-4 py-2 text-[13px] font-medium transition-none group border-l-2
                     ${active
-                      ? 'bg-primary/15 text-primary border-l-0'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      ? 'border-primary bg-slate-100 dark:bg-slate-800 text-primary'
+                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
                     }`}
                 >
-                  <span className={`${active ? 'text-primary' : 'text-slate-500 group-hover:text-slate-300'} transition-colors`}>
+                  <span className={`${active ? 'text-primary' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`}>
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
-                  {active && (
-                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
-                  )}
                 </Link>
               );
             })}
@@ -192,9 +182,9 @@ export default function Sidebar() {
           {/* Admin Section */}
           {user?.role === 'admin' && (
             <>
-              <div className="px-2 mb-2 pt-2 border-t border-slate-800/60">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-                  Admin
+              <div className="px-4 mb-2 pt-4 border-t border-slate-200 dark:border-slate-800">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Administration
                 </span>
               </div>
               <nav className="space-y-0.5">
@@ -204,19 +194,16 @@ export default function Sidebar() {
                     <Link
                       key={item.label}
                       href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 group
+                      className={`flex items-center gap-3 px-4 py-2 text-[13px] font-medium transition-none group border-l-2
                         ${active
-                          ? 'bg-primary/15 text-primary'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                          ? 'border-primary bg-slate-100 dark:bg-slate-800 text-primary'
+                          : 'border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
                         }`}
                     >
-                      <span className={`${active ? 'text-primary' : 'text-slate-500 group-hover:text-slate-300'} transition-colors`}>
+                      <span className={`${active ? 'text-primary' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`}>
                         {item.icon}
                       </span>
                       <span>{item.label}</span>
-                      {active && (
-                        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
-                      )}
                     </Link>
                   );
                 })}
@@ -226,20 +213,17 @@ export default function Sidebar() {
         </div>
 
         {/* Sidebar Footer — User Info */}
-        <div className="p-3 border-t border-slate-800/70 flex-shrink-0">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 flex-shrink-0">
           <Link
             href="/profile"
-            className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-slate-800/60 transition-all group"
+            className="flex items-center gap-2 px-2 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-none group"
           >
-            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-sm">
+            <div className="w-6 h-6 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-[10px] flex-shrink-0 rounded">
               {getInitials(user?.name)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-slate-200 truncate group-hover:text-white transition-colors">
+              <p className="text-[13px] font-semibold text-slate-700 dark:text-slate-200 truncate group-hover:text-primary transition-colors">
                 {user?.name || 'User'}
-              </p>
-              <p className="text-[10px] text-slate-500 truncate">
-                {user?.role === 'admin' ? 'Administrator' : 'Member'}
               </p>
             </div>
           </Link>

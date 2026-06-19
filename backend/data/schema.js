@@ -20,8 +20,14 @@ const ticketSchema = new Schema({
     required: true,
     enum: PRIORITIES,
   },
+  userCollection: {
+    type: String,
+    enum: ['User', 'Admin'],
+    required: true,
+  },
   userId: {
     type: Schema.Types.ObjectId,
+    refPath: 'userCollection',
     required: true,
   },
   user_email: {
@@ -33,9 +39,14 @@ const ticketSchema = new Schema({
     enum: ['open', 'in progress', 'closed'],
     default: 'open',
   },
+  assignedToCollection: {
+    type: String,
+    enum: ['User', 'Admin'],
+    default: 'Admin',
+  },
   assignedTo: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    refPath: 'assignedToCollection',
     default: null,
   },
   assignedToEmail: {
@@ -96,6 +107,7 @@ function buildTicketDocument(data) {
     title: data.title,
     body: data.body,
     priority: data.priority,
+    userCollection: data.userCollection,
     userId: data.userId,
     user_email: data.user_email,
     status: data.status || 'open',

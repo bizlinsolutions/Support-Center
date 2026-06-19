@@ -47,20 +47,13 @@ function TicketListContent() {
         loadTickets();
     }, [searchParam, page]);
 
-    // Priority badge style helper
-    function priorityBadge(p) {
-        if (p === 'high') return 'badge-high';
-        if (p === 'medium') return 'badge-medium';
-        return 'badge-low';
-    }
-
     return (
         <div className="space-y-6">
             {/* Show active search indicator if searchParam exists */}
             {searchParam && (
-                <div className="flex justify-between items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 py-3 px-5 rounded-xl text-xs font-semibold">
+                <div className="flex justify-between items-center bg-card-bg border border-border-color py-3 px-4 rounded-md text-[13px] font-semibold">
                     <span>Showing search results for: <strong className="text-primary">"{searchParam}"</strong></span>
-                    <Link href="/tickets" className="text-red-500 hover:underline">Clear Search</Link>
+                    <Link href="/tickets" className="text-rose-600 hover:underline">Clear Search</Link>
                 </div>
             )}
 
@@ -71,65 +64,65 @@ function TicketListContent() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <p className="text-slate-500 text-xs">Loading tickets...</p>
+                    <p className="text-slate-500 text-[13px]">Loading tickets...</p>
                 </div>
             ) : error ? (
-                <p className="text-center text-red-500 py-4 font-semibold">{error}</p>
+                <p className="text-center text-rose-500 py-4 font-semibold">{error}</p>
             ) : (
                 <>
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+                    <div className="table-card">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
-                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">ID</th>
-                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider w-1/2">Subject</th>
-                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Priority</th>
-                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider">Agent</th>
-                                        <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Created</th>
+                                    <tr className="table-header-row">
+                                        <th className="table-header-cell">ID</th>
+                                        <th className="table-header-cell w-1/2">Subject</th>
+                                        <th className="table-header-cell">Priority</th>
+                                        <th className="table-header-cell">Status</th>
+                                        <th className="table-header-cell">Agent</th>
+                                        <th className="table-header-cell-right">Created</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                                <tbody>
                                     {tickets.length === 0 ? (
-                                        <tr>
+                                        <tr className="table-row">
                                             <td colSpan="6" className="py-12 text-center">
-                                                <p className="text-sm text-slate-500 font-semibold mb-3">No tickets found matching the search criteria.</p>
-                                                <Link href="/tickets/create" className="inline-block bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold py-2 px-4 rounded-lg text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                                                <p className="empty-state-text font-semibold mb-3">No tickets found matching the search criteria.</p>
+                                                <Link href="/tickets/create" className="btn-outline inline-flex">
                                                     Create a Ticket
                                                 </Link>
                                             </td>
                                         </tr>
                                     ) : (
                                         tickets.map((ticket) => (
-                                            <tr key={ticket.publicId} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                                                <td className="py-3.5 px-5 text-xs font-bold text-slate-500 whitespace-nowrap">
-                                                    <Link href={`/tickets/${ticket.publicId}`} className="hover:text-primary transition-colors">
+                                            <tr key={ticket.publicId} className="table-row hover:bg-background transition-none group">
+                                                <td className="table-cell font-bold text-slate-500 whitespace-nowrap">
+                                                    <Link href={`/tickets/${ticket.publicId}`} className="hover:text-primary transition-none">
                                                         #{ticket.publicId}
                                                     </Link>
                                                 </td>
-                                                <td className="py-3.5 px-5">
+                                                <td className="table-cell">
                                                     <div className="flex items-center gap-2">
-                                                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ticket.priority === 'high' ? 'bg-red-500' : ticket.priority === 'medium' ? 'bg-blue-500' : 'bg-emerald-500'}`}></span>
-                                                        <Link href={`/tickets/${ticket.publicId}`} className="text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-colors line-clamp-1">
+                                                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ticket.priority === 'high' ? 'bg-rose-500' : ticket.priority === 'medium' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+                                                        <Link href={`/tickets/${ticket.publicId}`} className="font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-none line-clamp-1">
                                                             {ticket.title}
                                                         </Link>
                                                     </div>
                                                 </td>
-                                                <td className="py-3.5 px-5 whitespace-nowrap">
-                                                    <span className={`pill ${ticket.priority}`}>
+                                                <td className="table-cell whitespace-nowrap">
+                                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${ticket.priority === 'high' ? 'text-rose-600' : ticket.priority === 'medium' ? 'text-amber-600' : 'text-emerald-600'}`}>
                                                         {ticket.priority}
                                                     </span>
                                                 </td>
-                                                <td className="py-3.5 px-5 whitespace-nowrap">
-                                                    <span className={`badge-status-${ticket.status.replace(' ', '-')}`}>
+                                                <td className="table-cell whitespace-nowrap">
+                                                    <span className={`badge badge-status-${ticket.status.replace(' ', '-')}`}>
                                                         {ticket.status}
                                                     </span>
                                                 </td>
-                                                <td className="py-3.5 px-5 text-xs font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                                <td className="table-cell font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
                                                     {ticket.assignedToEmail || <span className="text-slate-400 italic font-normal">Unassigned</span>}
                                                 </td>
-                                                <td className="py-3.5 px-5 text-xs text-slate-500 text-right whitespace-nowrap">
+                                                <td className="table-cell-right text-slate-500 whitespace-nowrap">
                                                     {formatDateISO(ticket.createdAt)}
                                                 </td>
                                             </tr>
@@ -146,17 +139,17 @@ function TicketListContent() {
                             <button
                                 onClick={() => setPage(prev => Math.max(prev - 1, 1))}
                                 disabled={page === 1}
-                                className="btn-outline px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                                className="btn-outline disabled:opacity-50"
                             >
                                 Previous
                             </button>
-                            <span className="text-xs text-slate-500">
-                                Page <strong>{page}</strong> of <strong>{pagination.pages}</strong>
+                            <span className="text-[13px] text-slate-500">
+                                Page <strong className="text-slate-800 dark:text-slate-200">{page}</strong> of <strong className="text-slate-800 dark:text-slate-200">{pagination.pages}</strong>
                             </span>
                             <button
                                 onClick={() => setPage(prev => Math.min(prev + 1, pagination.pages))}
                                 disabled={page === pagination.pages}
-                                className="btn-outline px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                                className="btn-outline disabled:opacity-50"
                             >
                                 Next
                             </button>
@@ -170,7 +163,7 @@ function TicketListContent() {
 
 export default function TicketList() {
     return (
-        <Suspense fallback={<p className="text-center py-4">Loading ticket list...</p>}>
+        <Suspense fallback={<p className="text-center py-4 text-[13px] text-slate-500">Loading ticket list...</p>}>
             <TicketListContent />
         </Suspense>
     );

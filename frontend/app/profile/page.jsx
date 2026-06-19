@@ -73,42 +73,39 @@ export default function Profile() {
     <main className="max-w-xl my-8 mx-auto px-4 space-y-6">
       {/* Back Button */}
       <div>
-        <Link href="/" className="text-xs font-bold text-primary hover:underline flex items-center gap-1 min-h-[44px]">
+        <Link href="/" className="text-[13px] font-bold text-primary hover:underline flex items-center gap-1">
           ← Back to Dashboard
         </Link>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 md:p-8">
-        <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white mb-1 tracking-tight">My Profile</h2>
-        <p className="text-xs text-slate-500 mb-6 font-semibold">Manage your display settings, roles, and security details</p>
+      <div className="card p-6 md:p-8">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-1">My Profile</h2>
+        <p className="text-[13px] text-slate-500 mb-6">Manage your display settings, roles, and security details</p>
 
         <form onSubmit={handleUpdateProfile} className="space-y-5 bg-transparent border-0 shadow-none p-0 max-w-full">
           <div className="space-y-1">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
               Email Address
             </label>
             <input
               type="email"
               disabled
               value={email}
-              className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-950/40 text-slate-500 cursor-not-allowed border-slate-200 dark:border-slate-800 rounded-lg text-sm font-semibold min-h-[44px]"
+              className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950/40 text-slate-500 cursor-not-allowed border border-border-color rounded text-[13px] font-semibold"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
               Account Role
             </label>
-            <span className={`inline-block text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${role === 'admin'
-              ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
-              : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-            }`}>
+            <span className={`text-[11px] font-bold uppercase tracking-wider ${role === 'admin' ? 'text-primary' : 'text-slate-500'}`}>
               {role}
             </span>
           </div>
 
           <div className="space-y-1">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
               Display Name
             </label>
             <input
@@ -117,19 +114,19 @@ export default function Profile() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your display name"
-              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-850 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+              className="w-full px-3 py-2 bg-background border border-border-color rounded text-[13px] text-slate-800 dark:text-slate-100 focus:outline-none focus:border-primary transition-none"
             />
           </div>
 
-          <div className="border-t border-slate-100 dark:border-slate-800 my-6 pt-6 space-y-4">
+          <div className="border-t border-border-color my-6 pt-6 space-y-4">
             <div>
-              <h3 className="text-sm font-bold text-slate-800 dark:text-white">Change Password</h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase mt-0.5">Leave blank if you do not want to update password</p>
+              <h3 className="text-[13px] font-bold text-slate-800 dark:text-white">Change Password</h3>
+              <p className="text-[11px] text-slate-500 uppercase tracking-wider mt-0.5">Leave blank if you do not want to update password</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   New Password
                 </label>
                 <input
@@ -137,12 +134,12 @@ export default function Profile() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+                  className="w-full px-3 py-2 bg-background border border-border-color rounded text-[13px] text-slate-800 dark:text-slate-100 focus:outline-none focus:border-primary transition-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   Confirm Password
                 </label>
                 <input
@@ -150,7 +147,7 @@ export default function Profile() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter new password"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+                  className="w-full px-3 py-2 bg-background border border-border-color rounded text-[13px] text-slate-800 dark:text-slate-100 focus:outline-none focus:border-primary transition-none"
                 />
               </div>
             </div>
@@ -159,7 +156,7 @@ export default function Profile() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all flex justify-center items-center gap-2 cursor-pointer min-h-[44px]"
+            className="btn-primary w-full py-2"
           >
             {isLoading ? 'Saving Changes...' : 'Save Profile Changes'}
           </button>
@@ -168,3 +165,4 @@ export default function Profile() {
     </main>
   );
 }
+

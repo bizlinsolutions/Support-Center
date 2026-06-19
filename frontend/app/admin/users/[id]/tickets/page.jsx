@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useToast } from '../../../../components/Toast';
 import { getRelativeTimeString } from '../../../../lib/relativeTime';
 import fetchClient from '../../../../lib/fetchClient';
+import { formatDateISO } from '../../../../lib/formatDate';
 
 export default function UserTicketsPage() {
   const { id } = useParams();
@@ -56,12 +57,6 @@ export default function UserTicketsPage() {
     }
   }, [id]);
 
-  function priorityBadge(priority) {
-    if (priority === 'high') return 'badge-high';
-    if (priority === 'medium') return 'badge-medium';
-    return 'badge-low';
-  }
-
   const getInitials = (name) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -75,11 +70,11 @@ export default function UserTicketsPage() {
     return (
       <main>
         <div className="text-center py-16">
-          <svg className="animate-spin h-8 w-8 text-primary mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-6 w-6 text-primary mx-auto mb-2" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
-          <p className="text-slate-500 text-sm font-semibold">Loading user's support records...</p>
+          <p className="text-slate-500 text-[13px] font-semibold">Loading user's support records...</p>
         </div>
       </main>
     );
@@ -89,97 +84,114 @@ export default function UserTicketsPage() {
     <main className="max-w-6xl my-8 mx-auto px-4 space-y-6">
       {/* Back Button */}
       <div>
-        <Link href="/admin/users" className="text-xs font-bold text-primary hover:underline flex items-center gap-1 min-h-[44px]">
+        <Link href="/admin/users" className="text-[13px] font-bold text-primary hover:underline flex items-center gap-1">
           ← Back to Users Directory
         </Link>
       </div>
 
       {/* Profile Header */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="card flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg flex-shrink-0">
+          <div className="w-12 h-12 rounded-sm bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-lg flex-shrink-0">
             {getInitials(user?.name)}
           </div>
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-xl md:text-2xl font-extrabold text-slate-800 dark:text-white leading-none">{user?.name}</h2>
-              <span className={`text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${user?.role === 'admin'
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
-                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-                }`}>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white leading-none">{user?.name}</h2>
+              <span className={`text-[11px] font-bold uppercase tracking-wider ${user?.role === 'admin' ? 'text-primary' : 'text-slate-500'}`}>
                 {user?.role}
               </span>
             </div>
-            <p className="text-slate-400 dark:text-slate-500 text-xs sm:text-sm font-semibold mt-1.5">{user?.email}</p>
+            <p className="text-slate-500 text-[13px] font-medium mt-1">{user?.email}</p>
           </div>
         </div>
 
         {/* Mini stats */}
         <div className="flex items-center gap-4 text-center">
-          <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-200/40 dark:border-slate-800/40 px-4 py-2 rounded-xl">
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total</span>
-            <p className="text-base font-extrabold text-slate-700 dark:text-slate-205">{tickets.length}</p>
+          <div className="bg-background border border-border-color px-3 py-2 rounded">
+            <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Total</span>
+            <p className="text-lg font-bold text-slate-800 dark:text-slate-200">{tickets.length}</p>
           </div>
-          <div className="bg-yellow-50 dark:bg-yellow-950/10 border border-yellow-100/40 dark:border-yellow-900/10 px-4 py-2 rounded-xl">
-            <span className="text-[10px] text-yellow-650 dark:text-yellow-400 font-bold uppercase tracking-wider">Open</span>
-            <p className="text-base font-extrabold text-yellow-750 dark:text-yellow-350">{openCount}</p>
+          <div className="bg-background border border-border-color px-3 py-2 rounded">
+            <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Open</span>
+            <p className="text-lg font-bold text-slate-800 dark:text-slate-200">{openCount}</p>
           </div>
-          <div className="bg-indigo-50 dark:bg-indigo-950/10 border border-indigo-100/40 dark:border-indigo-900/10 px-4 py-2 rounded-xl">
-            <span className="text-[10px] text-indigo-650 dark:text-indigo-400 font-bold uppercase tracking-wider">In Progress</span>
-            <p className="text-base font-extrabold text-indigo-750 dark:text-indigo-350">{inProgressCount}</p>
+          <div className="bg-background border border-border-color px-3 py-2 rounded">
+            <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">In Progress</span>
+            <p className="text-lg font-bold text-slate-800 dark:text-slate-200">{inProgressCount}</p>
           </div>
-          <div className="bg-emerald-50 dark:bg-emerald-950/10 border border-emerald-100/40 dark:border-emerald-900/10 px-4 py-2 rounded-xl">
-            <span className="text-[10px] text-emerald-650 dark:text-emerald-400 font-bold uppercase tracking-wider">Closed</span>
-            <p className="text-base font-extrabold text-emerald-750 dark:text-emerald-350">{closedCount}</p>
+          <div className="bg-background border border-border-color px-3 py-2 rounded">
+            <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Closed</span>
+            <p className="text-lg font-bold text-slate-800 dark:text-slate-200">{closedCount}</p>
           </div>
         </div>
       </div>
 
       {/* Ticket List Section */}
       <div className="space-y-4">
-        <h3 className="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">
-          <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+        <h3 className="text-[13px] font-bold text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wider">
+          <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={1.5} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
           </svg>
           Support Tickets
         </h3>
 
         {tickets.length === 0 ? (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-12 rounded-xl text-center shadow-sm">
-            <svg className="w-16 h-16 text-slate-200 dark:text-slate-800 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p className="text-slate-500 dark:text-slate-400 font-semibold text-sm">This user hasn't submitted any support tickets yet.</p>
+          <div className="card text-center py-12">
+            <p className="empty-state-text font-semibold text-[13px]">This user hasn't submitted any support tickets yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tickets.map((ticket) => (
-              <div key={ticket.publicId} className="group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-sm hover:shadow-md transition-all">
-                <Link href={`/tickets/${ticket.publicId}`} className="block space-y-3">
-                  <div className="flex justify-between items-start gap-4">
-                    <h4 className="text-sm font-bold text-slate-800 dark:text-white truncate group-hover:text-primary transition-colors">
-                      {ticket.title}
-                    </h4>
-                    <div className="flex gap-2 items-center flex-shrink-0">
-                      <span className={priorityBadge(ticket.priority)}>
-                        {ticket.priority}
-                      </span>
-                      <span className={`badge-status-${ticket.status.replace(' ', '-')}`}>
-                        {ticket.status}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 leading-relaxed">
-                    {ticket.body}
-                  </p>
-                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 text-[10px] text-slate-400 dark:text-slate-500 flex justify-between font-semibold">
-                    <span>Submitted {getRelativeTimeString(ticket.createdAt)}</span>
-                    <span>Assigned: {ticket.assignedToEmail || 'Unassigned'}</span>
-                  </div>
-                </Link>
-              </div>
-            ))}
-          </div>
+          <div className="table-card">
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="table-header-row">
+                            <th className="table-header-cell">ID</th>
+                            <th className="table-header-cell w-1/2">Subject</th>
+                            <th className="table-header-cell">Priority</th>
+                            <th className="table-header-cell">Status</th>
+                            <th className="table-header-cell">Agent</th>
+                            <th className="table-header-cell-right">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tickets.map((ticket) => (
+                            <tr key={ticket.publicId} className="table-row group">
+                                <td className="table-cell font-bold text-slate-500 whitespace-nowrap">
+                                    <Link href={`/tickets/${ticket.publicId}`} className="hover:text-primary transition-none">
+                                        #{ticket.publicId}
+                                    </Link>
+                                </td>
+                                <td className="table-cell">
+                                    <div className="flex items-center gap-2">
+                                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ticket.priority === 'high' ? 'bg-rose-500' : ticket.priority === 'medium' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+                                        <Link href={`/tickets/${ticket.publicId}`} className="font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-none line-clamp-1">
+                                            {ticket.title}
+                                        </Link>
+                                    </div>
+                                </td>
+                                <td className="table-cell whitespace-nowrap">
+                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${ticket.priority === 'high' ? 'text-rose-600' : ticket.priority === 'medium' ? 'text-amber-600' : 'text-emerald-600'}`}>
+                                        {ticket.priority}
+                                    </span>
+                                </td>
+                                <td className="table-cell whitespace-nowrap">
+                                    <span className={`badge badge-status-${ticket.status.replace(' ', '-')}`}>
+                                        {ticket.status}
+                                    </span>
+                                </td>
+                                <td className="table-cell font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                    {ticket.assignedToEmail || <span className="text-slate-400 italic font-normal">Unassigned</span>}
+                                </td>
+                                <td className="table-cell-right text-slate-500 whitespace-nowrap">
+                                    {formatDateISO(ticket.createdAt)}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
         )}
       </div>
     </main>

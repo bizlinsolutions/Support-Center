@@ -3,9 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import fetchClient from '../lib/fetchClient';
-import Logo from '../components/logo.jpg';
 import { useToast } from '../components/Toast';
 
 export default function Signup() {
@@ -45,110 +43,60 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] grid grid-cols-1 md:grid-cols-2 bg-slate-50 dark:bg-slate-950">
-      {/* Left panel: branding, tagline, gradient */}
-      <div className="relative hidden md:flex flex-col justify-between p-12 bg-slate-900 overflow-hidden">
-        {/* Background gradient/pattern overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 z-0 opacity-90" />
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-[100px] z-0" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] z-0" />
-        
-        {/* Top brand */}
-        <div className="relative z-10 flex items-center gap-3">
-          <Image
-            src={Logo}
-            alt='DeskFlow Helpdesk Logo'
-            width={40}
-            height={40}
-            className="rounded-xl shadow-lg border border-white/10"
-            quality={100}
-          />
-          <span className="text-lg font-extrabold text-white font-sans tracking-tight">
-            DeskFlow
-          </span>
-        </div>
-
-        {/* Center message */}
-        <div className="relative z-10 max-w-md my-auto space-y-6">
-          <h1 className="text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
-            Join DeskFlow Today
-          </h1>
-          <p className="text-slate-300 text-sm leading-relaxed font-medium">
-            Create an account to start submitting tickets, tracking replies, and collaborating with support agents in a centralized interface.
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-8 h-8 bg-primary flex items-center justify-center text-white font-bold text-[13px] rounded mb-4">
+            D
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Create an account
+          </h2>
+          <p className="text-[13px] text-slate-500 mt-1">
+            Join DeskFlow to get started.
           </p>
         </div>
 
-        {/* Bottom copyright */}
-        <div className="relative z-10 text-xs text-slate-500 font-semibold">
-          © {new Date().getFullYear()} DeskFlow Helpdesk. All rights reserved.
-        </div>
-      </div>
-
-      {/* Right panel: Signup form */}
-      <div className="flex flex-col justify-center py-12 px-6 sm:px-12 lg:px-16 bg-white dark:bg-slate-950">
-        <div className="mx-auto w-full max-w-md space-y-8">
-          <div className="text-center md:text-left space-y-2">
-            {/* Show brand on mobile only */}
-            <div className="md:hidden flex justify-center mb-6">
-              <div className="flex items-center gap-3">
-                <Image
-                  src={Logo}
-                  alt='DeskFlow Logo'
-                  width={40}
-                  height={40}
-                  className="rounded-xl shadow-md"
-                />
-                <span className="text-lg font-extrabold text-slate-800 dark:text-white">DeskFlow</span>
-              </div>
-            </div>
-            
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Create Account
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
-              Join DeskFlow and start managing your support issues with ease.
-            </p>
-          </div>
-
-          <form onSubmit={handleSignup} className="space-y-5 bg-transparent border-0 shadow-none p-0 max-w-full my-0">
-            <div className="space-y-1">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                 Full Name
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. Adithya Ajith"
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+                placeholder="Enter your name"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-[13px] text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary transition-none"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Email Address
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Email
               </label>
               <input
                 type="email"
                 required
-                placeholder="e.g. adithya@theesaanam.com"
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+                placeholder="Enter your email"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-[13px] text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary transition-none"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Password (at least 6 characters)
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Password
               </label>
               <input
                 type="password"
                 required
                 minLength={6}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-[13px] text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary transition-none"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -157,29 +105,19 @@ export default function Signup() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all flex justify-center items-center gap-2 cursor-pointer min-h-[44px]"
+              className="w-full bg-primary text-white font-semibold py-2 px-4 rounded text-[13px] hover:bg-primary-hover focus:outline-none transition-none flex justify-center items-center gap-2 mt-2 disabled:opacity-50"
             >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Creating account...
-                </>
-              ) : (
-                'Create Account'
-              )}
+              {isLoading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
-
-          <p className="text-center md:text-left text-sm text-slate-500 dark:text-slate-400 font-semibold">
-            Already registered?{' '}
-            <Link href="/login" className="text-primary hover:underline">
-              Login here
-            </Link>
-          </p>
         </div>
+
+        <p className="text-center text-[13px] text-slate-500 mt-6">
+          Already have an account?{' '}
+          <Link href="/login" className="text-primary hover:underline font-medium">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );
