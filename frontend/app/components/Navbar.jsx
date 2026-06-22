@@ -69,7 +69,7 @@ export default function Navbar() {
     window.dispatchEvent(new CustomEvent('toggle-mobile-sidebar'));
   };
 
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const isAuthPage = pathname === '/login' || pathname === '/login/admin' || pathname === '/signup';
   const showSidebar = user && !isAuthPage;
 
   return (

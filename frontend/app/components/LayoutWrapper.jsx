@@ -8,7 +8,7 @@ export default function LayoutWrapper({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [hasUser, setHasUser] = useState(false);
 
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const isAuthPage = pathname === '/login' || pathname === '/login/admin' || pathname === '/signup';
 
   // Check user on route change
   useEffect(() => {

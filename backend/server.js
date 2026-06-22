@@ -173,15 +173,9 @@ app.post('/auth/login', async (req, res) => {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    let user = await Admin.findOne({ email: normalizedEmail });
-    let collection = 'Admin';
-    let role = 'admin';
 
-    if (!user) {
-      user = await User.findOne({ email: normalizedEmail });
-      collection = 'User';
-      role = 'user';
-    }
+    // User login: only check User collection
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -196,8 +190,8 @@ app.post('/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const accessToken = createAccessToken(user, collection);
-    const refreshToken = createRefreshToken(user, collection);
+    const accessToken = createAccessToken(user, 'User');
+    const refreshToken = createRefreshToken(user, 'User');
 
     return res.json({
       accessToken,
@@ -206,11 +200,61 @@ app.post('/auth/login', async (req, res) => {
         id: user.publicId,
         name: user.name,
         email: user.email,
-        role,
+        role: 'user',
       },
     });
   } catch (error) {
     console.error('[Login Error]', error);
+    return res.status(500).json({ error: 'Unable to login' });
+  }
+});
+
+app.post('/auth/login/admin', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Admin login: only check Admin collection
+    const admin = await Admin.findOne({ email: normalizedEmail });
+
+    if (!admin) {
+      // Check if the email belongs to a regular user
+      const regularUser = await User.findOne({ email: normalizedEmail });
+      if (regularUser) {
+        return res.status(403).json({ error: 'This account does not have admin privileges' });
+      }
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    if (admin.isActive === false) {
+      return res.status(401).json({ error: 'Your account has been deactivated' });
+    }
+
+    const isMatch = await bcrypt.compare(password, admin.passwordHash);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    const accessToken = createAccessToken(admin, 'Admin');
+    const refreshToken = createRefreshToken(admin, 'Admin');
+
+    return res.json({
+      accessToken,
+      refreshToken,
+      user: {
+        id: admin.publicId,
+        name: admin.name,
+        email: admin.email,
+        role: 'admin',
+      },
+    });
+  } catch (error) {
+    console.error('[Admin Login Error]', error);
     return res.status(500).json({ error: 'Unable to login' });
   }
 });

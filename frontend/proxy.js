@@ -35,7 +35,7 @@ export async function proxy(request) {
   }
 
   // On login/signup pages: if user already has a valid token, send them home
-  if (pathname === '/login' || pathname === '/signup') {
+  if (pathname === '/login' || pathname === '/login/admin' || pathname === '/signup') {
     if (token && !isTokenExpired(token)) {
       return NextResponse.redirect(new URL('/', request.url));
     }
@@ -44,6 +44,9 @@ export async function proxy(request) {
 
   // No token at all → go to login
   if (!token && !refreshToken) {
+    if (pathname.startsWith('/admin') || pathname.startsWith('/login/admin')) {
+      return NextResponse.redirect(new URL('/login/admin', request.url));
+    }
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
@@ -78,7 +81,7 @@ export async function proxy(request) {
         return response;
       } else {
         // Refresh failed → clear cookies and redirect to login
-        const loginUrl = new URL('/login', request.url);
+        const loginUrl = new URL(pathname.startsWith('/admin') ? '/login/admin' : '/login', request.url);
         const response = NextResponse.redirect(loginUrl);
         response.cookies.delete('token');
         response.cookies.delete('refreshToken');
@@ -87,7 +90,7 @@ export async function proxy(request) {
       }
     } catch {
       // Network error during refresh → redirect to login
-      const loginUrl = new URL('/login', request.url);
+      const loginUrl = new URL(pathname.startsWith('/admin') ? '/login/admin' : '/login', request.url);
       const response = NextResponse.redirect(loginUrl);
       response.cookies.delete('token');
       response.cookies.delete('refreshToken');
@@ -98,6 +101,9 @@ export async function proxy(request) {
 
   // Token exists and is still valid
   if (!token) {
+    if (pathname.startsWith('/admin')) {
+      return NextResponse.redirect(new URL('/login/admin', request.url));
+    }
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

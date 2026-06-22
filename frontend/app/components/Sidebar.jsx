@@ -9,7 +9,7 @@ export default function Sidebar() {
   const [user, setUser] = useState(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const isAuthPage = pathname === '/login' || pathname === '/login/admin' || pathname === '/signup';
 
   useEffect(() => {
     const getCookie = () => {
